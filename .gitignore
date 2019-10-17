@@ -15,7 +15,8 @@
 log/*
 temp/* 
 exports/*
-libs/sharkpylib 
+plugins/*/
+!plugins/blueprint
 
 system/settings.pkl
 

@@ -9,18 +9,12 @@ import matplotlib as mpl
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-import datetime
 
 import os
-import numpy as np
-import pandas as pd
-#import shutil
 
 from sharkpylib import loglib
-from plugins.gismo_qc import gui
 
 import sharkpylib.tklib.tkinter_widgets as tkw
-import sharkpylib.tklib.tkmap as tkmap
 
 logger = loglib.get_logger(name='gismo_gui')
 
