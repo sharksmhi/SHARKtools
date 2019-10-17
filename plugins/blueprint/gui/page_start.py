@@ -6,17 +6,6 @@
 
 import tkinter as tk
 
-from plugins.gismo_qc import gui
-
-pages = set()
-#============================================================================
-# Ferrybox pages
-try:
-    pages.add(gui.PageTimeSeries)
-except:
-    pass
-
-
 
 """
 ================================================================================

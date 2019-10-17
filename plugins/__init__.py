@@ -5,8 +5,7 @@ import importlib
 
 PLUGIN_LIST = [p for p in os.listdir(os.path.dirname(__file__)) if not '.' in p and not p.startswith('__')]
 
-# PLUGIN_LIST.pop(PLUGIN_LIST.index('blueprint'))
-# PLUGIN_LIST.pop(PLUGIN_LIST.index('temp'))
+PLUGIN_LIST.pop(PLUGIN_LIST.index('blueprint'))
 
 for plugin in PLUGIN_LIST:
     importlib.import_module('plugins.{}'.format(plugin))
