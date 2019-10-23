@@ -22,3 +22,5 @@ system/settings.pkl
 
 users/* 
 !users/default
+
+sharkpylib/*
