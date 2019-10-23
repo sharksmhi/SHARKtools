@@ -4,4 +4,4 @@ matplotlib
 
 # Unsure about version on for matplotlib. 1.5.1 does not seem to work via pip
 
--e git+https://github.com/sharksmhi/sharkpylib#egg=sharkpylib
+# -e git+https://github.com/sharksmhi/sharkpylib#egg=sharkpylib
