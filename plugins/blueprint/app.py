@@ -205,29 +205,6 @@ class App(PluginApp):
                 # print('page_name', page_name)
                 frame.update_page()
 
-    def _update_menubar_users(self):
-        # delete old entries
-        for k in range(100):
-            try:
-                self.user_menu.delete(0)
-            except:
-                break
-        # User settings
-        self.user_menu.add_command(label='User settings',
-                                   command=lambda: self.show_frame(gui.PageUser))
-        self.user_menu.add_separator()
-
-        # All users
-        for user in self.user_manager.get_user_list():
-            self.user_menu.add_command(label='Change to user: {}'.format(user),
-                                       command=lambda x=user: self._change_user(x))
-        self.user_menu.add_separator()
-
-        # New user
-        self.user_menu.add_command(label='Create new user',
-                                   command=self._create_new_user)
-
-
     def show_frame(self, page_name):
         """
         This method brings the given Page to the top of the GUI. 

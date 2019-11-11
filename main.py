@@ -2,7 +2,7 @@
 # License: MIT License (see LICENSE.txt or http://opensource.org/licenses/mit).
 
 # To use basemap you might need to install Microsoft Visual C++: https://visualstudio.microsoft.com/visual-cpp-build-tools/
-import plugins
+
 # print(plugins.MODULE_LIST)
 import tkinter as tk
 # print(MODULE_LIST)
@@ -13,15 +13,12 @@ import os
 import sys
 import socket
 import importlib
-#
-# import matplotlib.pyplot as plt
-#
+
 import gui
 import core
-#
-# from sharkpylib.gismo import GISMOsession
-#
-# from sharkpylib import gismo
+
+
+import sharkpylib
 from sharkpylib import loglib
 import sharkpylib.tklib.tkinter_widgets as tkw
 #
@@ -30,6 +27,8 @@ from core.exceptions import *
 #
 # import threading
 #
+import plugins
+
 ALL_PAGES = dict()
 ALL_PAGES['PageStart'] = gui.PageStart
 ALL_PAGES['PageAbout'] = gui.PageAbout

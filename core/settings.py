@@ -237,6 +237,8 @@ class SettingsFiles(object):
         self.name_to_path = {}
 
         for file_name in sorted(os.listdir(self.directory)):
+            if not file_name.endswith('.json'):
+                continue
             self.file_names.append(file_name)
             name = file_name.split('.')[0]
             self.files.append(name)
@@ -245,7 +247,7 @@ class SettingsFiles(object):
             self.name_to_path[name] = p
 
     def get_list(self):
-        return self.files
+        return self.files[:]
 
     def get_path(self, file):
         return self.name_to_path.get(file, '')

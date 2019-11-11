@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import tkinter as tk
 from tkinter import ttk
+import sys
+print(sys.path)
 import sharkpylib.tklib.tkinter_widgets as tkw
 
 import webbrowser
