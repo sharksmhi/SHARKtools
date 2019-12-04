@@ -212,7 +212,7 @@ class Settings(dict):
 
 
 
-class SettingsFiles(object):
+class SamplingTypeSettingsFiles(object):
     """
     Class hold
     """

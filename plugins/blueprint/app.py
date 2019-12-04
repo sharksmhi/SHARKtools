@@ -82,7 +82,7 @@ class App(PluginApp):
         self.paths = core.Paths(self.plugin_directory)
 
         # Load settings files object
-        self.settings_files = core.SettingsFiles(self.paths.directory_settings_files)
+        self.settings_files = core.SamplingTypeSettingsFiles(self.paths.directory_settings_files)
 
         self.settings = self.main_app.settings
 

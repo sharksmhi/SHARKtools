@@ -5,6 +5,7 @@
 # License: MIT License (see LICENSE.txt or http://opensource.org/licenses/mit).
 
 import tkinter as tk
+import sharkpylib.tklib.tkinter_widgets as tkw
 
 
 
@@ -57,11 +58,11 @@ class PageStart(tk.Frame):
                 
 #                self.frames[r][c].update_idletasks()
                 
-        
-        for r in range(nr_rows):
-            for c in range(nr_columns):
-                self.grid_rowconfigure(r, weight=1)
-                self.grid_columnconfigure(c, weight=1)
+        tkw.grid_configure(self, nr_rows=nr_rows, nr_columns=nr_columns)
+        # for r in range(nr_rows):
+        #     for c in range(nr_columns):
+        #         self.grid_rowconfigure(r, weight=1)
+        #         self.grid_columnconfigure(c, weight=1)
 #                self.frames[r][c].grid_rowconfigure(0, weight=1)
 #                self.frames[r][c].grid_columnconfigure(0, weight=1)
         #----------------------------------------------------------------------
@@ -95,8 +96,9 @@ class PageStart(tk.Frame):
                                  bg=color)
 
             self.button[page_name].grid(row=0, column=0, padx=padx, pady=pady, sticky='nsew')
-            self.frames[r][c].grid_rowconfigure(0, weight=1)
-            self.frames[r][c].grid_columnconfigure(0, weight=1)
+            tkw.grid_configure(self.frames[r][c])
+            # self.frames[r][c].grid_rowconfigure(0, weight=1)
+            # self.frames[r][c].grid_columnconfigure(0, weight=1)
             c+=1
             if c >= nr_columns:
                 c = 0
