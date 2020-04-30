@@ -4,6 +4,9 @@
 # To use basemap you might need to install Microsoft Visual C++: https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
 # print(plugins.MODULE_LIST)
+import matplotlib
+matplotlib.use(u'TkAgg')
+
 import tkinter as tk
 # print(MODULE_LIST)
 # from tkinter import ttk
