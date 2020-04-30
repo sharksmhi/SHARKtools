@@ -167,6 +167,8 @@ class MainApp(tk.Tk):
         self.update_all()
         self.deiconify()
 
+        # self._quick_run_F1(None)
+
     def _set_user_settings(self):
         self.USER_SETTINGS = []
 
@@ -352,12 +354,12 @@ class MainApp(tk.Tk):
         self.activate_binding_keys()
 
 
-
-
-
     # ===========================================================================
     def _quick_run_F1(self, event):
-        pass
+        print('F1')
+        name = 'SHARKtools_tavastland'
+        sub_page = 'PageTavastland'
+        self.show_subframe(name, sub_page)
 
     # ===========================================================================
     def _quick_run_F2(self, event):

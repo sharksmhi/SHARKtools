@@ -465,3 +465,7 @@ def show_warning(title, message):
 def show_error(title, message):
     messagebox.showerror(title, message)
 
+
+def show_internal_error(message):
+    messagebox.showerror('Internal error', message)
+

@@ -16,5 +16,6 @@ from gui.widgets import SaveWidgetHTML
 from gui.widgets import show_information
 from gui.widgets import show_error
 from gui.widgets import show_warning
+from gui.widgets import show_internal_error
 
 from gui import communicate
