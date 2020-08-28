@@ -7,6 +7,10 @@ import importlib
 import logging
 import logging.config
 import logging.handlers
+
+import matplotlib
+matplotlib.use(u'TkAgg')
+
 import os
 import socket
 import tkinter as tk
