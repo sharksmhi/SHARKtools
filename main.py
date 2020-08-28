@@ -3,31 +3,21 @@
 
 # To use basemap you might need to install Microsoft Visual C++: https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
-# print(plugins.MODULE_LIST)
-import tkinter as tk
-# print(MODULE_LIST)
-# from tkinter import ttk
-# from tkinter import filedialog
-#
-import os
-import sys
-import socket
 import importlib
+import logging
+import logging.config
+import logging.handlers
+import os
+import socket
+import tkinter as tk
+from pathlib import Path
 
-import gui
-import core
-
-
-import sharkpylib
-from sharkpylib import loglib
 import sharkpylib.tklib.tkinter_widgets as tkw
-#
-# from sharkpylib.gismo.exceptions import *
-from core.exceptions import *
-#
-# import threading
-#
+
+import core
+import gui
 import plugins
+from core.exceptions import *
 
 ALL_PAGES = dict()
 ALL_PAGES['PageStart'] = gui.PageStart
@@ -44,9 +34,6 @@ APP_TO_PAGE = dict()
 for plugin_name, plugin_app in ALL_PAGES.items():
     APP_TO_PAGE[plugin_app] = plugin_name
 
-
-    # PLUGINS[plugin] = eval('plugins.{}'.format(plugin))
-    # eval('ALL_PAGES.add(plugins.{}.App)'.format(plugin))
 
 # TODO: Check required constants in plugins
 
@@ -68,12 +55,13 @@ class MainApp(tk.Tk):
                  users_directory='',
                  root_directory='',
                  log_directory='',
-                 mapping_files_directory='',
-                 default_settings_file_path='',
+                 # mapping_files_directory='',
+                 # default_settings_file_path='',
                  *args, **kwargs):
         """
         Updated 20181002
         """
+        self.all_ok = True
         self.version = '2019.10.1'
 
         tk.Tk.__init__(self, *args, **kwargs)
@@ -82,73 +70,64 @@ class MainApp(tk.Tk):
         if not all([users_directory, root_directory, log_directory]):
             raise AttributeError
 
-        self._set_user_settings()
-
-        # Load settings and constants (singletons)
-        self.app_directory = os.path.dirname(os.path.abspath(__file__))
-        self.root_directory = root_directory
-        self.users_directory = users_directory
-        self.log_directory = log_directory
-        # self.mapping_files_directory = mapping_files_directory
+        # Save paths
+        self.app_directory = Path(os.path.dirname(os.path.abspath(__file__)))
+        self.root_directory = Path(root_directory)
+        self.users_directory = Path(users_directory)
+        self.log_directory = Path(log_directory)
 
         # Setting upp GUI logger
-        if not os.path.exists(self.log_directory):
+        if not self.log_directory.exists():
             os.makedirs(self.log_directory)
 
-        # TODO: When to clear log files?
-        self.logger = loglib.get_logger(name='gismo_main',
-                                        logfiles=[dict(level='DEBUG',
-                                                       file_path=os.path.join(self.log_directory,
-                                                                              'main_debug.log')),
-                                                  dict(level='WARNING',
-                                                       file_path=os.path.join(self.log_directory,
-                                                                              'main_warning.log')),
-                                                  dict(level='ERROR',
-                                                       file_path=os.path.join(self.log_directory,
-                                                                              'main_error.log'))
-                                                  ])
+        self._set_user_settings()
+
+        self.computer_name = self._get_computer_name()
+        self.user_manager = core.UserManager(users_root_directory=self.users_directory, app_root_directory=self.root_directory)
+
+        self._load_user()
+        # self.all_ok = False
+        # return
+
+        logging.config.fileConfig('logging.conf')
+        self.logger = logging.getLogger('mainapptimedrotating')
+
+        # kw = {'when': 's', 'interval': 2, 'backupCount': 5}
+        # self.logger = logging.getLogger(__name__)
+        # self.logger.setLevel(logging.DEBUG)
+        # handler = logging.handlers.TimedRotatingFileHandler('log/main_app.log', **kw)
+        # self.logger.addHandler(handler)
 
         self.logger.debug('===== START ======')
+        self.logger.debug('debug')
+        self.logger.warning('warning')
+        self.logger.error('error')
+
 
         # Load paths
         self.paths = core.Paths(self.app_directory)
 
         # TODO: See if root directory and Settings are necessary
-        self.settings = core.Settings(default_settings_file_path=default_settings_file_path,
-                                      root_directory=self.root_directory)
+        # self.settings = core.Settings(default_settings_file_path=default_settings_file_path,
+        #                               root_directory=self.root_directory)
 
-        self._load_user()
-
-        screen_padx = self.settings['general']['Main window indent x']
-        screen_pady = self.settings['general']['Main window indent y']
+        geo = self.user_manager.get_app_settings('main window', 'geometry', '1480x950+0+0')
 
         self.info_popup = gui.InformationPopup(self)
 
-        # Override "close window (x)".
-        # Override "close window (x)".
         # If this is not implemented the program is not properly closed.
         self.protocol('WM_DELETE_WINDOW', self.quit_toolbox)
 
-        # Set geometry, title etc.
-        #        self.geometry(u'%sx%s+0+0' % (self.winfo_screenwidth(),
-        #                                     self.winfo_screenheight()))
-        self.geometry('%sx%s+0+0' % (self.winfo_screenwidth() - screen_padx,
-                                     self.winfo_screenheight() - screen_pady))
-        #         tk.Tk.iconbitmap(self, default=u'D:/Utveckling/w_sharktoolbox/data/logo.ico')
-        # TODO: Icon does not work
-        self._create_titles()
+        self.geometry(geo)
 
-        self.all_ok = True
+        self._create_titles()
 
         self.active_page = None
         self.previous_page = None
-        # self.admin_mode = False
         self.progress_running = False
         self.progress_running_toplevel = False
 
-        self.latest_loaded_sampling_type = ''
 
-        #        self.sv = tk.StringVar()
         self._set_frame()
 
         # Make menu at the top
@@ -175,36 +154,39 @@ class MainApp(tk.Tk):
                     w=self.winfo_width(),
                     h=self.winfo_height())
 
+    @staticmethod
+    def _get_computer_name():
+        computer_name = 'my_computer'
+        try:
+            computer_name = socket.gethostname()
+        except:
+            pass
+        return computer_name
+
     def _load_user(self):
-        user_directories = {}
+        user_directories = dict()
         user_directories[self] = self.users_directory
-        plugins = self.get_plugins()
-        for name, plugin_module in plugins.items():
+        _plugins = self.get_plugins()
+        for name, plugin_module in _plugins.items():
             users_dir = plugin_module.INFO.get('users_directory', 'users')
             if users_dir:
-                user_directories[plugin_module] = os.path.join(self.app_directory, 'plugins', name, users_dir)
-        self.user_manager = core.UserManager(self.users_directory)
+                user_directories[plugin_module] = Path(self.app_directory, 'plugins', name, users_dir)
         for plugin_module, directory in user_directories.items():
             # Load user managers. One for each plugin. We only use one at the end.
             self.user_manager.set_users_directory(directory)
-            self.computer_name = 'my_computer'
-            try:
-                self.computer_name = socket.gethostname()
-                # os.path.expanduser('~').split('\\')[-1]
-            except:
-                pass
-            default_user = self.settings.get('user', {}).get('Startup user', 'default')
+            default_user = self.user_manager.get_app_settings('user', 'startup', 'default')
+            # default_user = self.settings.get('user', {}).get('Startup user', 'default')
             startup_user = self.computer_name
             self.user_manager.set_user('default', create_if_missing=True)
-            # self.user = self.user_manager.user
             if default_user == 'default':
                 if startup_user not in self.user_manager.get_user_list():
                     self.user_manager.add_user(startup_user, default_user)
             else:
                 startup_user = default_user
             # print('startup_user', startup_user)
-            self.settings.change_setting('user', 'Startup user', startup_user)
-            self.settings.save_settings()
+            self.user_manager.set_app_settings('user', 'startup', startup_user)
+            # self.settings.change_setting('user', 'Startup user', startup_user)
+            # self.settings.save_settings()
             self.user_manager.set_user(startup_user, create_if_missing=True)
             self.user = self.user_manager.user
 
@@ -223,8 +205,6 @@ class MainApp(tk.Tk):
                                                 settings_type=settings_type,
                                                 settings_name=settings_name)
 
-
-    # ==========================================================================
     def _set_frame(self):
         self.frame_top = tk.Frame(self)
         self.frame_mid = tk.Frame(self)
@@ -265,16 +245,14 @@ class MainApp(tk.Tk):
         self.frame_info = tk.Frame(self.frame_bot)
         self.frame_info.grid(row=0, column=0, sticky="nsew")
 
-        # ttk.Separator(self.frame_bot, orient=tk.VERTICAL).grid(row=0, column=1, sticky='ns')
         # TODO: Progressbar deactivated. Threading not working as expected.
         self.frame_progress = tk.Frame(self.frame_bot)
-        # self.frame_progress.grid(row=0, column=2, sticky="nsew")
+
         self.progress_widget = tkw.ProgressbarWidget(self.frame_progress, sticky='nsew')
 
         self.info_widget = tkw.LabelFrameLabel(self.frame_info, pack=False)
 
         tkw.grid_configure(self.frame_info)
-        # tkw.grid_configure(self.frame_progress)
 
         tkw.grid_configure(self.frame_bot)
         # tkw.grid_configure(self.frame_bot, nr_columns=3, c0=20, c2=4)
@@ -350,15 +328,12 @@ class MainApp(tk.Tk):
 
         self.activate_binding_keys()
 
-
-    # ===========================================================================
     def _quick_run_F1(self, event):
         print('F1')
         name = 'SHARKtools_tavastland'
         sub_page = 'PageTavastland'
         self.show_subframe(name, sub_page)
 
-    # ===========================================================================
     def _quick_run_F2(self, event):
         pass
 
@@ -398,7 +373,6 @@ class MainApp(tk.Tk):
         self.info_widget.reset()
 
     def update_all(self):
-
         for page_name, frame in self.frames.items():
             if self.pages_started.get(page_name):
                 frame.update_page()
@@ -409,7 +383,6 @@ class MainApp(tk.Tk):
         """
         self.menubar = tk.Menu(self)
 
-        # -----------------------------------------------------------------------
         # File menu
         self.file_menu = tk.Menu(self.menubar, tearoff=0)
         self.file_menu.add_command(label=u'Home',
@@ -418,12 +391,9 @@ class MainApp(tk.Tk):
         self.file_menu.add_command(label=u'Quit', command=self.quit_toolbox)
         self.menubar.add_cascade(label=u'File', menu=self.file_menu)
 
-        # -----------------------------------------------------------------------
         # Plugins menu
         self.plugins_menu = tk.Menu(self.menubar, tearoff=0)
-        # -----------------------------------------------------------------------
 
-        # ======================================================================================
         for name, plugin in PLUGINS.items():
             sub_pages = PLUGINS[name].INFO.get('sub_pages', [])
             title = plugin.INFO.get('title')
@@ -435,29 +405,10 @@ class MainApp(tk.Tk):
                 self.plugins_menu.add_cascade(label=title, menu=special_menu)
             else:
                 self.plugins_menu.add_command(label=title,
-                                         command=lambda x=name: self.show_frame(x))
+                                              command=lambda x=name: self.show_frame(x))
 
         self.menubar.add_cascade(label='Plugins', menu=self.plugins_menu)
-        # ======================================================================================
 
-        # for name in PLUGINS:
-        #     sub_pages_menu_list = []
-        #     title = self.titles.get(name)
-        #     self.plugins_menu.add_command(label=title,
-        #                                   command=lambda x=name: self.show_frame(x))
-        #     for subpage in PLUGINS[name].INFO.get('subpages', []):
-        #         sub_name = subpage.get(name)
-        #         sub_pages_menu = tk.Menu(self.plugins_menu, tearoff=0)
-        #         sub_pages_menu.add_command(label=subpage.get('name'),
-        #                                    command=lambda: self.show_subframe(name, sub_name))
-        #
-        #         sub_pages_menu_list.append(sub_pages_menu)
-        #
-        #     self.plugins_menu.add_cascade(label=title, menu=sub_pages_menu_list)
-        #
-        # self.menubar.add_cascade(label='Plugins', menu=self.plugins_menu)
-
-        # -----------------------------------------------------------------------
         # Users menu
         self.user_menu = tk.Menu(self.menubar, tearoff=0)
 
@@ -465,14 +416,12 @@ class MainApp(tk.Tk):
 
         self.menubar.add_cascade(label='Users', menu=self.user_menu)
 
-        # -----------------------------------------------------------------------
         # Help menu
         self.info_menu = tk.Menu(self.menubar, tearoff=0)
         self.info_menu.add_command(label='About',
                                    command=lambda: self.show_frame('PageAbout'))
         self.menubar.add_cascade(label='Info', menu=self.info_menu)
 
-        # -----------------------------------------------------------------------
         # Insert menu
         self.config(menu=self.menubar)
 
@@ -501,13 +450,6 @@ class MainApp(tk.Tk):
         if not plugin:
             return None
         return ALL_PAGES.get(plugin)
-        # if plugin and 'plugins' in plugin.__name__:
-        #     app_class = plugin.
-        #     app_class = eval('{}.app.App'.format(plugin.__name__))
-        #     return app_class
-        # else:
-        #     return None
-
 
     def _update_menubar_users(self):
         # delete old entries
@@ -516,14 +458,12 @@ class MainApp(tk.Tk):
                 self.user_menu.delete(0)
             except:
                 break
+
         # Add items
-        # print('self.active_page', self.active_page)
-        # User settings
         user_page = self._get_user_page_class(self.active_page)
         if user_page:
             self.user_menu.add_command(label='User settings',
                                        command=lambda: self.show_plugin_user_page(self.active_page))
-            # self.user_menu.entryconfig('User settings', state='normal')
         else:
             # Set random Page and disable
             self.user_menu.add_command(label='User settings',
@@ -542,12 +482,7 @@ class MainApp(tk.Tk):
         self.user_menu.add_command(label='Create new user',
                                    command=self._create_new_user)
 
-        # Import user
-        # self.user_menu.add_command(label='Import user',
-        #                            command=None)
-
     def _create_new_user(self):
-
         def _create_user():
             source_user = widget_source_user.get_value().strip()
             new_user_name = widget_new_user_name.get_value().strip()
@@ -600,11 +535,10 @@ class MainApp(tk.Tk):
         self.user = self.user_manager.user
         self.info_popup = gui.InformationPopup(self)
 
-        tk.Tk.wm_title(self, 'GISMO Toolbox, user: {}'.format(self.user.name))
+        tk.Tk.wm_title(self, 'SHARKtools, user: {}'.format(self.user.name))
 
         # Save startup user in settings
-        self.settings.change_setting('user', 'Startup user', user_name)
-        self.settings.save_settings()
+        self.user_manager.set_app_settings('user', 'startup', user_name)
 
         # Make updates
         self.make_user_updates()
@@ -613,7 +547,7 @@ class MainApp(tk.Tk):
         self.update_all()
 
     def _update_program_title(self):
-        tk.Tk.wm_title(self, 'GISMOtoolbox (user: {}) :: {}'.format(self.user.name, self._get_title(self.active_page)))
+        tk.Tk.wm_title(self, 'SHARKtools (user: {}) :: {}'.format(self.user.name, self._get_title(self.active_page)))
 
     # ===========================================================================
     def show_plugin_user_page(self, active_page):
@@ -627,11 +561,8 @@ class MainApp(tk.Tk):
         self.frames[active_page].show_frame(user_page)
 
     def show_subframe(self, main_page, sub_page):
-        print(0)
         self.show_frame(main_page)
-        print(1)
         self.frames[main_page].show_frame(sub_page)
-        print(2)
 
     def _get_users_directory_for_plugin(self, plugin_name):
         plugin_module = PLUGINS.get(plugin_name)
@@ -640,29 +571,21 @@ class MainApp(tk.Tk):
         users_directory = plugin_module.INFO.get('users_directory', 'users')
         if not users_directory:
             return None
-        user_dir = os.path.join(self.app_directory, 'plugins', plugin_name, users_directory)
+        user_dir = Path(self.app_directory, 'plugins', plugin_name, users_directory)
         return user_dir
 
-
-    # ===========================================================================
     def show_frame(self, page_name=None, page=None):
         """
         This method brings the given Page to the top of the GUI.
         Before "raise" call frame startup method.
         This is so that the Page only loads ones.
         """
-        #         if page == PageAdmin and not self.admin_mode:
-        #             page = PagePassword
-
         load_page = True
         if page:
             page_name = APP_TO_PAGE[page]
         frame = self.frames[page_name]
 
-        # Update user directory
-        # Save user name
         user_name = self.user_manager.user.name
-        print('USER NAME', user_name)
         user_dir = self._get_users_directory_for_plugin(page_name)
         if user_dir:
             self.user_manager.set_users_directory(user_dir)
@@ -670,100 +593,40 @@ class MainApp(tk.Tk):
             self.user_manager.set_users_directory(self.users_directory)
         self.user_manager.set_user(user_name, create_if_missing=True)
 
-        # self.withdraw()
         if not self.pages_started.get(page_name):
-            # self.run_progress_in_toplevel(frame.startup, 'Opening page, please wait...')
             frame.startup()
             self.pages_started[page_name] = True
 
-
         frame.update_page()
-        # self.deiconify()
-        #             try:
-        #                 frame.update()
-        #             except:
-        #                 Log().information(u'%s: Could not update page.' % title)
 
-        # -----------------------------------------------------------------------
         if load_page:
             frame.tkraise()
             self.previous_page = self.active_page
             self.active_page = page_name
             self._update_program_title()
+
             # Check page history
             if page_name in self.page_history:
                 self.page_history.pop()
                 self.page_history.append(page_name)
 
         self._update_menubar_users()
-
         self.update()
 
     def _show_frame(self, page):
+        # Not used at the moment
         self.withdraw()
         # self._show_frame(page)
-        self.run_progress_in_toplevel(lambda x=page: self._show_frame(x), 'Opening page, please wait...')
+        self.run_progress_in_toplevel(lambda x=page: self.show_frame(x), 'Opening page, please wait...')
         self.deiconify()
 
-    #     def show_frame(self, page):
-    #         """
-    #         This method brings the given Page to the top of the GUI.
-    #         Before "raise" call frame startup method.
-    #         This is so that the Page only loads ones.
-    #         """
-    # #         if page == PageAdmin and not self.admin_mode:
-    # #             page = PagePassword
-    #
-    #         load_page = True
-    #         frame = self.frames[page]
-    #
-    #         self.withdraw()
-    #         title = self._get_title(page)
-    #         if not self.pages_started[page]:
-    #             frame.startup()
-    #             self.pages_started[page] = True
-    #
-    #
-    #         frame.update_page()
-    # #             try:
-    # #                 frame.update()
-    # #             except:
-    # #                 Log().information(u'%s: Could not update page.' % title)
-    #
-    #         #-----------------------------------------------------------------------
-    #         if load_page:
-    #             frame.tkraise()
-    #             tk.Tk.wm_title(self, u'GISMO Toolbox: %s' % title)
-    #             self.previous_page = self.active_page
-    #             self.active_page = page
-    #
-    #             # Check page history
-    #             if page in self.page_history:
-    #                 self.page_history.pop()
-    #                 self.page_history.append(page)
-    #
-    #
-    #         try:
-    #             if self.active_page == gui.PageCTD:
-    #                 self.notebook_load.select_frame('CTD files')
-    #
-    #         except:
-    #             pass
-    #
-    #         self.update()
-    #         self.deiconify()
-
-    # ===========================================================================
     def goto_previous_page(self, event):
         if self.previous_page:
             self.show_frame(self.previous_page)
 
-            # ===========================================================================
-
     def previous_page(self, event):
         self.page_history.index(self.active_page)
 
-    # ===========================================================================
     def update_app(self):
         """
         Updates all information about loaded series.
@@ -771,40 +634,30 @@ class MainApp(tk.Tk):
 
         self.update_all()
 
-    # ===========================================================================
     def quit_toolbox(self):
-        # TODO: Not implemented. Should we?
-        if self.settings.settings_are_modified:
-            save_settings = tk.messagebox.askyesnocancel(u'Save core.Settings?',
-                                                        u"""
-                                                        You have made one or more changes to the 
-                                                        toolbox settings during this session.
-                                                        Do you want to change these changes permanent?
-                                                        """)
-            if save_settings == True:
-                self.settings.save_settings()
-                self.settings.settings_are_modified = False
-            else:
-                return
-
+        self.user_manager.set_app_settings('main window', 'geometry', self.geometry())
+        self._close_log_handlers()
         self.destroy()  # Closes window
         self.quit()  # Terminates program
 
-    # ===========================================================================
+    def _close_log_handlers(self):
+        for handler in self.logger.handlers:
+            handler.close()
+
     def _get_title(self, page):
         if page in self.titles:
             return self.titles[page]
         else:
             return ''
 
-    # ===========================================================================
     def _create_titles(self):
         self.titles = {}
 
         for name, plugin in PLUGINS.items():
             self.titles[name] = plugin.INFO.get('title')
 
-    def get_plugins(self):
+    @staticmethod
+    def get_plugins():
         return PLUGINS
 
 
@@ -843,18 +696,17 @@ def main():
     users_directory = os.path.join(root_directory, 'users')
     log_directory = os.path.join(root_directory, 'log')
     default_settings_file_path = os.path.join(root_directory, 'system/settings.ini')
-    # mapping_files_directory = os.path.join(root_directory, 'data/mapping_files')
 
     if not os.path.exists(log_directory):
         os.mkdir(log_directory)
 
     app = MainApp(root_directory=root_directory,
                   users_directory=users_directory,
-                  log_directory=log_directory,
                   # mapping_files_directory=mapping_files_directory,
-                  default_settings_file_path=default_settings_file_path)
+                  # default_settings_file_path=default_settings_file_path,
+                  log_directory=log_directory)
     if not app.all_ok:
-        return 
+        return app
     app.focus_force()
     app.mainloop()
     return app

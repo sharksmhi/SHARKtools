@@ -4,31 +4,14 @@
 # To use basemap you might need to install Microsoft Visual C++: https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
 
-import tkinter as tk 
-from tkinter import ttk
-from tkinter import filedialog
-
 import os
-import sys
-import socket
+import tkinter as tk
 
-import matplotlib.pyplot as plt
-
-from plugins.blueprint import gui
-import core
-
-from sharkpylib.gismo import GISMOsession
-
-from sharkpylib import gismo
-from sharkpylib import loglib
 import sharkpylib.tklib.tkinter_widgets as tkw
 
+import core
+from plugins.blueprint import gui
 from plugins.plugin_app import PluginApp
-
-from sharkpylib.gismo.exceptions import *
-from core.exceptions import *
-
-import threading
 
 ALL_PAGES = dict()
 ALL_PAGES['PageStart'] = gui.PageStart
@@ -67,17 +50,7 @@ class App(PluginApp):
         if not os.path.exists(self.log_directory):
             os.makedirs(self.log_directory)
 
-        self.logger = loglib.get_logger(name='blueprint',
-                                        logfiles=[dict(level='DEBUG',
-                                                       file_path=os.path.join(self.log_directory,
-                                                                              'blueprint_debug.log')),
-                                                  dict(level='WARNING',
-                                                       file_path=os.path.join(self.log_directory,
-                                                                              'blueprint_warning.log')),
-                                                  dict(level='ERROR',
-                                                       file_path=os.path.join(self.log_directory,
-                                                                              'blueprint_error.log'))
-                                                  ])
+        self.logger = self.main_app.logger
 
         self.paths = core.Paths(self.plugin_directory)
 

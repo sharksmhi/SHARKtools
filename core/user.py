@@ -1,39 +1,53 @@
 # Copyright (c) 2018 SMHI, Swedish Meteorological and Hydrological Institute
 # License: MIT License (see LICENSE.txt or http://opensource.org/licenses/mit).
+import datetime
+import json
+import logging
 import os
 import shutil
-import json
-import datetime
-import pandas as pd
 import socket
+from pathlib import Path
+
+import pandas as pd
 
 from core.exceptions import *
-
-import logging
 
 gui_logger = logging.getLogger('gui_logger')
 
 
 class UserManager(object):
-    def __init__(self, users_root_directory):
-        self.directory_user_settings = {}
-
-    def set_users_directory(self, users_root_directory):
+    def __init__(self, users_root_directory=None, app_root_directory=None):
         self.users_root_directory = users_root_directory
-        if not os.path.exists(self.users_root_directory):
-            os.mkdir(self.users_root_directory)
+        self.app_root_directory = app_root_directory
+        self.current_user_directory = None
+        self.directory_user_settings = {}
         self.users = {}
-        for user in os.listdir(users_root_directory):
+        self.user = None
+        self.app_settings = None
+
+        self._load_app_settings()
+
+    def _load_app_settings(self):
+        self.app_settings = AppSettings(directory=self.users_root_directory,
+                                        name='app_settings',
+                                        app_root_directory=self.app_root_directory)
+
+    def set_users_directory(self, users_directory):
+        self.current_user_directory = users_directory
+        if not self.current_user_directory.exists():
+            os.mkdir(self.current_user_directory)
+        self.users = {}
+        for user in os.listdir(users_directory):
             if user == '.active':
                 continue
             # print('-', user)
-            self.users[user] = User(user, users_root_directory)
-            directory_dict = self.directory_user_settings.get(self.users_root_directory, {})
+            self.users[user] = User(user, self.current_user_directory)
+            directory_dict = self.directory_user_settings.get(self.current_user_directory, {})
             for settings_type in directory_dict:
                 # print('--', settings_type)
                 for item in directory_dict[settings_type]:
                     # print('---', item)
-                    self.users[user]._add_user_settings(settings_type, **item)
+                    self.users[user].add_user_settings(settings_type, **item)
         try:
             self.set_active_user()
         except GUIExceptionUserError:
@@ -52,19 +66,18 @@ class UserManager(object):
         return sorted(self.users)
 
     def add_user(self, user_name, from_user=None):
-        print('¤¤¤', self.users_root_directory)
         if user_name in self.users:
             raise GUIExceptionUserError('User already exists')
         if from_user:
             if from_user not in self.users:
                 raise GUIExceptionUserError('Could not find source user')
-            from_dir = os.path.join(self.users_root_directory, from_user)
-            to_dir = os.path.join(self.users_root_directory, user_name)
-            shutil.copytree(from_dir, to_dir)
+            from_dir = Path(self.current_user_directory, from_user)
+            to_dir = Path(self.current_user_directory, user_name)
+            shutil.copytree(str(from_dir), str(to_dir))
         else:
             # New user
             pass
-        self.users[user_name] = User(user_name, self.users_root_directory)
+        self.users[user_name] = User(user_name, self.current_user_directory)
 
     def add_user_settings(self, users_directory=None, settings_type=None, settings_name=None, **kwargs):
         self.directory_user_settings.setdefault(users_directory, {})
@@ -89,23 +102,28 @@ class UserManager(object):
         except:
             return None
 
-    def load_active_user(self):
-        """
-        Looks in the active user file to find the latest active user. If no file found the computer name is the user.
-        :return:
-        """
-        pass
+    def get_app_settings(self, par, key, default_value=None):
+        return self.app_settings.setdefault(par, key, default_value)
+
+    def set_app_settings(self, par, key, value):
+        self.app_settings.set(par, key, value)
+
+    def set_default_user(self):
+        self.set_user('default')
 
     def set_active_user(self):
         active_user = self._get_active_user()
         self.set_user(active_user)
 
     def _get_active_user_file_path(self):
-        return os.path.join(self.users_root_directory, '.active')
+        return Path(self.current_user_directory, '.active')
 
-    def _get_active_user(self):
-        file_path = self._get_active_user_file_path()
-        if not os.path.exists(file_path):
+    def _get_active_user(self, user_directory=None):
+        if user_directory:
+            file_path = Path(user_directory, '.active')
+        else:
+            file_path = self._get_active_user_file_path()
+        if not file_path.exists():
             active_user = socket.gethostname()
         else:
             with open(file_path) as fid:
@@ -117,7 +135,6 @@ class UserManager(object):
         with open(file_path, 'w') as fid:
             fid.write(user)
 
-
 class User(object):
     def __init__(self, name, users_root_directory, **kwargs):
         self.name = name
@@ -126,8 +143,7 @@ class User(object):
         if not os.path.exists(self.user_directory):
             os.mkdir(self.user_directory)
 
-
-    def _add_user_settings(self, settings_type, **kwargs):
+    def add_user_settings(self, settings_type, **kwargs):
         if settings_type == 'basic':
             obj = UserSettings(directory=self.user_directory, user=self.name, **kwargs)
         elif settings_type == 'parameter':
@@ -135,7 +151,6 @@ class User(object):
         elif settings_type == 'prioritylist':
             obj = UserSettingsPriorityList(directory=self.user_directory, user=self.name, **kwargs)
         setattr(self, obj.name, obj)
-
 
 
 class UserSettings(object):
@@ -240,21 +255,12 @@ class UserSettings(object):
         """
         if self.user == 'default':
             return
-        # print('set1', key, type(value), value)
-        # print('set11', key, type(self.data.get(key)), self.data.get(key))
-        #gui_logger.debug('USER-set1: {}; {}, {}, {}'.format(self.settings_type, key, type(value), value))
         if key not in self.data:
             self.data.setdefault(key, value)
         else:
             self.data[key] = value
-
-            # print('set22', key, type(self.data.get(key)), self.data.get(key))
-        #gui_logger.debug('USER-set2: {}; {}, {}, {}'.format(self.settings_type, key, type(self.data[key]), self.data[key]))
-        # print('???', self.settings_type, key, type(self.data[key]), self.data[key])
-
         if save:
             self.save()
-
 
     def get_settings(self):
         """
@@ -321,6 +327,100 @@ class UserSettingsParameter(UserSettings):
         :return:
         """
         return self.data.get(par, {}).get(key, None)
+
+    def get_settings(self, par=None):
+        """
+        Returns the whole dictionary self.data. If par is given self.data[par] is returned
+        :param par:
+        :return:
+        """
+        if par:
+            return self.data.get(par, {})
+        else:
+            return self.data
+
+    def datestring_to_datetime(self):
+        for par in self.data:
+            for key, value in self.data[par].items():
+                if 'time' in key:
+                    if value:
+                        self.data[par][key] = datetime.datetime.strptime(value, self.time_string_format)
+
+    def datetime_to_datestring(self):
+        for par in self.data:
+            for key, value in self.data[par].items():
+                if 'time' in key:
+                    if value:
+                        self.data[par][key] = pd.to_datetime(value).strftime(self.time_string_format)
+
+
+class AppSettings(UserSettingsParameter):
+    def __init__(self, directory=None, app_root_directory=None, name=None, user=None, **kwargs):
+        self.app_root_directory = app_root_directory
+        UserSettingsParameter.__init__(self, directory=directory, name=name, user=user, **kwargs)
+
+    def _convert_root_to_path(self, path):
+        new_path = Path(str(path).replace('root', str(self.app_root_directory)))
+        return new_path
+
+    def _convert_path_to_root(self, path):
+        new_path = str(path).replace(str(self.app_root_directory), 'root')
+        return new_path
+
+    def setdefault(self, par, key, value, save=True):
+        """
+        Works as setdefault for a dictionary. Should always be called with key and value.
+        If data is set (key not in self.data) the dictionary is saved to json file.
+        :param key:
+        :param value:
+        :return:
+        """
+        if self.user == 'default':
+            return
+
+        if par == 'directory':
+            value = self._convert_path_to_root(value)
+
+        self.data.setdefault(par, {})
+        value = self.data[par].setdefault(key, value)
+        if save:
+            self.save()
+
+        if par == 'directory':
+            value = self._convert_root_to_path(value)
+        return value
+
+    def set(self, par, key, value, save=True):
+        """
+        Sets key to value for parameter par
+        :param par:
+        :param key:
+        :param value:
+        :return:
+        """
+        if self.user == 'default':
+            return
+
+        if par == 'directory':
+            value = self._convert_path_to_root(value)
+
+        self.data.setdefault(par, {})
+        self.data[par].setdefault(key, value)
+        self.data[par][key] = value
+        if save:
+            self.save()
+
+    def get(self, par, key):
+        """
+
+        :param par:
+        :param key:
+        :return:
+        """
+        value = self.data.get(par, {}).get(key, None)
+        if par == 'directory':
+            value = self._convert_root_to_path(value)
+        return value
 
     def get_settings(self, par=None):
         """
