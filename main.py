@@ -23,6 +23,8 @@ import gui
 import plugins
 from core.exceptions import *
 
+ROOT_PATH = Path(__file__).parent
+
 ALL_PAGES = dict()
 ALL_PAGES['PageStart'] = gui.PageStart
 ALL_PAGES['PageAbout'] = gui.PageAbout
@@ -93,7 +95,7 @@ class MainApp(tk.Tk):
         # self.all_ok = False
         # return
 
-        logging.config.fileConfig('logging.conf')
+        logging.config.fileConfig(Path(ROOT_PATH, 'logging.conf'))
         self.logger = logging.getLogger('mainapptimedrotating')
 
         # kw = {'when': 's', 'interval': 2, 'backupCount': 5}

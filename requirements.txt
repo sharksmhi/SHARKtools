@@ -2,6 +2,10 @@ pandas==0.23.4
 cmocean==1.2
 matplotlib
 
-# Unsure about version on for matplotlib. 1.5.1 does not seem to work via pip
+-r https://github.com/sharksmhi/sharkpylib/raw/master/requirements.txt
+-e git+https://github.com/sharksmhi/sharkpylib#egg=sharkpylib
 
-# -e git+https://github.com/sharksmhi/sharkpylib#egg=sharkpylib
+-r https://github.com/sharksmhi/ctdpy/raw/master/requirements.txt
+-e git+https://github.com/sharksmhi/ctdpy#egg=ctdpy
+
+# Unsure about version for matplotlib. 1.5.1 does not seem to work via pip
