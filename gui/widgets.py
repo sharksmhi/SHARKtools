@@ -343,8 +343,11 @@ class InformationPopup(object):
 
     def show_information(self, text=''):
 
-        if not self.user_manager.user.options.setdefault('show_info_popups', True):
-            return
+        try:
+            if not self.user_manager.user.options.setdefault('show_info_popups', True):
+                return
+        except:
+            pass
 
         padx = 5
         pady = 5

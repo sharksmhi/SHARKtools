@@ -32,20 +32,13 @@ class PluginApp(tk.Frame):
         self.main_app = main_app
         self.version = ''
 
+        self.log_directory = self.main_app.log_directory
+
         self.info_popup = self.main_app.info_popup
 
         self.plugin_directory = os.path.dirname(sys.modules[self.__module__].__file__)
         self.root_directory = self.main_app.root_directory
         self.users_directory = self.main_app.users_directory
-        self.log_directory = self.main_app.log_directory
-        # self.mapping_files_directory = self.main_app.mapping_files_directory
-
-    # def get_user_settings(self):
-    #     """
-    #     Fill to add settings objects
-    #     :return: list with tuples as (settings_type, name)
-    #     """
-    #     raise GISMOExceptionMethodNotImplemented
 
     def startup(self):
         """
@@ -55,20 +48,7 @@ class PluginApp(tk.Frame):
         if not os.path.exists(self.log_directory):
             os.makedirs(self.log_directory)
 
-        self.logger = loglib.get_logger(name='default',
-                                        logfiles=[dict(level='DEBUG',
-                                                       file_path=os.path.join(self.log_directory, 'default_debug.log')),
-                                                  dict(level='WARNING',
-                                                       file_path=os.path.join(self.log_directory, 'default_warning.log')),
-                                                  dict(level='ERROR',
-                                                       file_path=os.path.join(self.log_directory,
-                                                                               'default_error.log'))
-                                                  ])
-
         self.paths = core.Paths(self.plugin_directory)
-
-        # Load settings files object
-        self.settings_files = core.SamplingTypeSettingsFiles(self.paths.directory_settings_files)
 
         # Load settings
         self.settings = self.main_app.settings

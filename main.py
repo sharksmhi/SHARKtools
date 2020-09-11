@@ -105,10 +105,6 @@ class MainApp(tk.Tk):
         # self.logger.addHandler(handler)
 
         self.logger.debug('===== START ======')
-        self.logger.debug('debug')
-        self.logger.warning('warning')
-        self.logger.error('error')
-
 
         # Load paths
         self.paths = core.Paths(self.app_directory)

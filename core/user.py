@@ -195,6 +195,11 @@ class UserSettings(object):
                 if value:
                     self.data[key] = pd.to_datetime(value).strftime(self.time_string_format)
 
+    def path_to_string(self):
+        for key, value in self.data.items():
+            if isinstance(value, Path):
+                self.data[key] = str(value)
+
     def save(self):
         """
         Writes information to json file.

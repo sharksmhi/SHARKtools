@@ -25,8 +25,6 @@ for page_name, page in ALL_PAGES.items():
 class App(PluginApp):
     """
     """
-    
-    #===========================================================================
     def __init__(self, parent, main_app, **kwargs):
         PluginApp.__init__(self, parent, main_app, **kwargs)
         # parent is the frame "container" in App. contoller is the App class
@@ -38,10 +36,6 @@ class App(PluginApp):
         self.plugin_directory = os.path.dirname(os.path.abspath(__file__))
         self.root_directory = self.main_app.root_directory
         self.log_directory = self.main_app.log_directory
-        # self.mapping_files_directory = self.main_app.mapping_files_directory
-
-    # def get_user_settings(self):
-    #     return [('basic', 'test')]
 
     def startup(self):
         """
@@ -53,9 +47,6 @@ class App(PluginApp):
         self.logger = self.main_app.logger
 
         self.paths = core.Paths(self.plugin_directory)
-
-        # Load settings files object
-        self.settings_files = core.SamplingTypeSettingsFiles(self.paths.directory_settings_files)
 
         self.settings = self.main_app.settings
 
@@ -83,17 +74,14 @@ class App(PluginApp):
 
         self.update_all()
 
-
     def update_page(self):
         self.update_all()
 
-    #==========================================================================
     def _set_frame(self):
         self.frame_top = tk.Frame(self, bg='red')
         self.frame_mid = tk.Frame(self, bg='green')
         self.frame_bot = tk.Frame(self, bg='blue')
 
-        
         # Grid
         self.frame_top.grid(row=0, column=0, sticky="nsew")
         self.frame_mid.grid(row=1, column=0, sticky="nsew")
@@ -121,11 +109,9 @@ class App(PluginApp):
         
         # Gridconfigure 
         tkw.grid_configure(self.frame_mid, nr_columns=2)
-        
-        #----------------------------------------------------------------------
+
         # Frame bot
         self._set_frame_bot()
-
 
     def _set_frame_bot(self):
         self.frame_info = tk.Frame(self.frame_bot)
@@ -142,14 +128,10 @@ class App(PluginApp):
         tkw.grid_configure(self.frame_info)
         tkw.grid_configure(self.frame_bot)
 
-
-    #===========================================================================
     def startup_pages(self):
         # Tuple that store all pages
-        
         self.pages_started = dict()
-        
-        
+
         # Dictionary to store all frame classes
         self.frames = {}
         
