@@ -209,12 +209,12 @@ class MainApp(tk.Tk):
 
     def _set_frame(self):
         self.frame_top = tk.Frame(self)
-        self.frame_mid = tk.Frame(self)
+        # self.frame_mid = tk.Frame(self)
         self.frame_bot = tk.Frame(self)
 
         # Grid
         self.frame_top.grid(row=0, column=0, sticky="nsew")
-        self.frame_mid.grid(row=1, column=0, sticky="nsew")
+        # self.frame_mid.grid(row=1, column=0, sticky="nsew")
         self.frame_bot.grid(row=2, column=0, sticky="nsew")
 
         # Gridconfigure
@@ -228,16 +228,16 @@ class MainApp(tk.Tk):
         tkw.grid_configure(self.frame_top)
 
         # ----------------------------------------------------------------------
-        # Frame mid
-        self.frame_mid_left = tk.Frame(self.frame_mid)
-        self.frame_mid_right = tk.Frame(self.frame_mid)
-
-        # Grid
-        self.frame_mid_left.grid(row=0, column=0, sticky="nsew")
-        self.frame_mid_right.grid(row=0, column=1, sticky="nsew")
-
-        # Gridconfigure
-        tkw.grid_configure(self.frame_mid, nr_columns=2)
+        # # Frame mid
+        # self.frame_mid_left = tk.Frame(self.frame_mid)
+        # self.frame_mid_right = tk.Frame(self.frame_mid)
+        #
+        # # Grid
+        # self.frame_mid_left.grid(row=0, column=0, sticky="nsew")
+        # self.frame_mid_right.grid(row=0, column=1, sticky="nsew")
+        #
+        # # Gridconfigure
+        # tkw.grid_configure(self.frame_mid, nr_columns=2)
 
         # ----------------------------------------------------------------------
         # Frame bot
