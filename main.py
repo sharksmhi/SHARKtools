@@ -140,7 +140,8 @@ class MainApp(tk.Tk):
 
         # Show start page given in settings.ini
         self.page_history = ['PageAbout']
-        self.show_frame('PageStart')
+        self.show_subframe('SHARKtools_svea_ctd', 'PageBasic')
+        # self.show_frame('PageStart')
 
         self.update_all()
         self.deiconify()
