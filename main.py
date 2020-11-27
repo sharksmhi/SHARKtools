@@ -95,14 +95,14 @@ class MainApp(tk.Tk):
         # self.all_ok = False
         # return
 
-        logging.config.fileConfig(Path(ROOT_PATH, 'logging.conf'))
-        self.logger = logging.getLogger('mainapptimedrotating')
+        # logging.config.fileConfig(Path(ROOT_PATH, 'logging.conf'))
+        # self.logger = logging.getLogger('mainapptimedrotating')
 
-        # kw = {'when': 's', 'interval': 2, 'backupCount': 5}
-        # self.logger = logging.getLogger(__name__)
-        # self.logger.setLevel(logging.DEBUG)
-        # handler = logging.handlers.TimedRotatingFileHandler('log/main_app.log', **kw)
-        # self.logger.addHandler(handler)
+        self.logger = None
+        # self.logging_level = 'WARNING'
+        self.logging_level = self.user_manager.get_app_settings('logging', 'level', 'WARNING')
+        self.logging_format = '%(asctime)s [%(levelname)10s]    %(pathname)s [%(lineno)d] => %(funcName)s():    %(message)s'
+        self._setup_logger(**kwargs)
 
         self.logger.debug('===== START ======')
 
@@ -129,11 +129,11 @@ class MainApp(tk.Tk):
         self.progress_running = False
         self.progress_running_toplevel = False
 
-
         self._set_frame()
 
         # Make menu at the top
         self._set_menubar()
+        self.selected_logging_level.set(self.logging_level)
 
         self.startup_pages()
         self.user_manager.set_users_directory(self.users_directory)
@@ -147,6 +147,26 @@ class MainApp(tk.Tk):
         self.deiconify()
 
         # self._quick_run_F1(None)
+
+    def _setup_logger(self, **kwargs):
+        name = Path(__file__).stem
+        self.logger = logging.getLogger(name)
+        self.logger.setLevel(self.logging_level)
+        file_path = kwargs.get('logging_file_path')
+        if not file_path:
+            directory = Path(Path(__file__).absolute().parent, 'log')
+            if not directory.exists():
+                os.makedirs(directory)
+            file_path = Path(directory, f'{name}.log')
+        # handler = logging.FileHandler(str(file_path))
+        handler = logging.handlers.TimedRotatingFileHandler(str(file_path), when='D', interval=1, backupCount=7)
+        formatter = logging.Formatter(self.logging_format)
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
+
+    def set_logging_level(self, level):
+        self.logging_level = level
+        self.logger.setLevel(level)
 
     def _set_user_settings(self):
         self.USER_SETTINGS = []
@@ -388,11 +408,19 @@ class MainApp(tk.Tk):
 
         # File menu
         self.file_menu = tk.Menu(self.menubar, tearoff=0)
-        self.file_menu.add_command(label=u'Home',
+        self.file_menu.add_command(label='Home',
                                    command=lambda: self.show_frame('PageStart'))
+        self.log_level_menu = tk.Menu(self.menubar, tearoff=0)
+        self.selected_logging_level = tk.StringVar()
+        for level in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
+            self.log_level_menu.add_radiobutton(label=level,
+                                                variable=self.selected_logging_level,
+                                                command=self._on_change_logging_level)
+        self.file_menu.add_cascade(label='Logging level', menu=self.log_level_menu)
+
         self.file_menu.add_separator()
-        self.file_menu.add_command(label=u'Quit', command=self.quit_toolbox)
-        self.menubar.add_cascade(label=u'File', menu=self.file_menu)
+        self.file_menu.add_command(label='Quit', command=self.quit_toolbox)
+        self.menubar.add_cascade(label='File', menu=self.file_menu)
 
         # Plugins menu
         self.plugins_menu = tk.Menu(self.menubar, tearoff=0)
@@ -427,6 +455,12 @@ class MainApp(tk.Tk):
 
         # Insert menu
         self.config(menu=self.menubar)
+
+    def _on_change_logging_level(self, *args):
+        level = self.selected_logging_level.get()
+        self.set_logging_level(level)
+        self.user_manager.set_app_settings('logging', 'level', level)
+        self.logger.error('error test')
 
     def _get_user_page_class(self, plugin_name):
         """

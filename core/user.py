@@ -37,17 +37,25 @@ class UserManager(object):
         if not self.current_user_directory.exists():
             os.mkdir(self.current_user_directory)
         self.users = {}
-        for user in os.listdir(users_directory):
-            if user == '.active':
+        users_directory = Path(users_directory).absolute()
+        # for user in os.listdir(users_directory):
+        for user in users_directory.iterdir():
+            if not user.is_dir():
                 continue
-            # print('-', user)
-            self.users[user] = User(user, self.current_user_directory)
+            # if user == '.active':
+            #     continue
+            # print('user', user, users_directory)
+            # if not Path(user).is_dir():
+            #     print('NOT', Path(user))
+            #     continue
+            # print('YES')
+            self.users[user.name] = User(user.name, self.current_user_directory)
             directory_dict = self.directory_user_settings.get(self.current_user_directory, {})
             for settings_type in directory_dict:
                 # print('--', settings_type)
                 for item in directory_dict[settings_type]:
                     # print('---', item)
-                    self.users[user].add_user_settings(settings_type, **item)
+                    self.users[user.name].add_user_settings(settings_type, **item)
         try:
             self.set_active_user()
         except GUIExceptionUserError:
@@ -134,6 +142,7 @@ class UserManager(object):
         file_path = self._get_active_user_file_path()
         with open(file_path, 'w') as fid:
             fid.write(user)
+
 
 class User(object):
     def __init__(self, name, users_root_directory, **kwargs):
