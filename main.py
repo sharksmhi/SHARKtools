@@ -140,7 +140,8 @@ class MainApp(tk.Tk):
 
         # Show start page given in settings.ini
         self.page_history = ['PageAbout']
-        self.show_subframe('SHARKtools_svea_ctd', 'PageBasic')
+        self.show_default_subframe()
+        # self.show_subframe('SHARKtools_svea_ctd', 'PageBasic')
         # self.show_frame('PageStart')
 
         self.update_all()
@@ -597,9 +598,20 @@ class MainApp(tk.Tk):
         user_page = self._get_user_page_class(active_page)
         self.frames[active_page].show_frame(user_page)
 
+    def show_default_subframe(self):
+        mainpage = self.user_manager.get_app_settings('start page', 'mainpage', 'PageStart')
+        subpage = self.user_manager.get_app_settings('start page', 'subpage', '')
+        if subpage:
+            self.show_subframe(mainpage, subpage)
+        else:
+            self.show_frame(mainpage)
+
     def show_subframe(self, main_page, sub_page):
+        print(main_page, sub_page)
         self.show_frame(main_page)
         self.frames[main_page].show_frame(sub_page)
+        self.user_manager.set_app_settings('start page', 'mainpage', main_page)
+        self.user_manager.set_app_settings('start page', 'subpage', sub_page)
 
     def _get_users_directory_for_plugin(self, plugin_name):
         plugin_module = PLUGINS.get(plugin_name)
@@ -649,6 +661,8 @@ class MainApp(tk.Tk):
 
         self._update_menubar_users()
         self.update()
+        self.user_manager.set_app_settings('start page', 'mainpage', page_name)
+        self.user_manager.set_app_settings('start page', 'subpage', '')
 
     def _show_frame(self, page):
         # Not used at the moment
