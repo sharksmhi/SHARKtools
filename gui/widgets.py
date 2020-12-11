@@ -27,6 +27,7 @@ class SaveWidget(ttk.LabelFrame):
                  prop_frame={},  
                  prop_entry={},
                  callback=None,
+                 callback_odv=None,
                  user=None,
                  **kwargs):
                      
@@ -47,6 +48,7 @@ class SaveWidget(ttk.LabelFrame):
 
         self.include_file_name = include_file_name
         self.callback = callback
+        self.callback_odv = callback_odv
         self.user = user
         
         self._set_frame()
@@ -86,6 +88,10 @@ class SaveWidget(ttk.LabelFrame):
 
         ttk.Button(frame, text='Save', command=self._save_file).grid(row=r, column=c+1, columnspan=2, padx=padx, pady=pady, sticky='se')
         r += 1
+        if self.callback_odv:
+            ttk.Button(frame, text='Save ODV file', command=self._save_odv_file).grid(row=r, column=c + 1, columnspan=2, padx=padx,
+                                                                         pady=pady, sticky='se')
+            r += 1
 
         tkw.grid_configure(frame, nr_rows=r)
    
@@ -109,16 +115,22 @@ class SaveWidget(ttk.LabelFrame):
     def get_directory(self):
         return self.stringvar_directory.get().strip()
 
-    #===========================================================================
     def _save_file(self):
         if self.callback:
-            directory = self.stringvar_directory.get().strip() #.replace('\\', '/')
+            directory = self.stringvar_directory.get().strip()  # .replace('\\', '/')
             file_name = self.stringvar_file_name.get().strip()
             if self.user:
                 self.user.path.set('export_directory', directory)
             self.callback(directory, file_name)
-    
-    #===========================================================================
+
+    def _save_odv_file(self):
+        if self.callback_odv:
+            directory = self.stringvar_directory.get().strip()  # .replace('\\', '/')
+            file_name = self.stringvar_file_name.get().strip()
+            if self.user:
+                self.user.path.set('export_directory', directory)
+            self.callback_odv(directory, file_name)
+
     def set_file_path(self, file_path=None):
         if not file_path: # or os.path.exists(file_path):
             self.stringvar_directory.set('')

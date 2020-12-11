@@ -664,7 +664,7 @@ class MainApp(tk.Tk):
         self.user_manager.set_app_settings('start page', 'mainpage', page_name)
         self.user_manager.set_app_settings('start page', 'subpage', '')
 
-    def _show_frame(self, page):
+    def old_show_frame(self, page):
         # Not used at the moment
         self.withdraw()
         # self._show_frame(page)
