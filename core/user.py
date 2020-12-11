@@ -218,6 +218,9 @@ class UserSettings(object):
         #     return
         # Convert datetime object to str
         self.datetime_to_datestring()
+
+        # Convert Paths
+        self.path_to_string()
         # print('=' * 20)
         # print('SAVE')
         # for key in sorted(self.data):
