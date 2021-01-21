@@ -1,6 +1,9 @@
-pandas==0.23.4
-cmocean==1.2
-matplotlib
+screeninfo
+
+
+# pandas==0.23.4
+# cmocean==1.2
+# matplotlib
 
 # https://raw.githubusercontent.com/sharksmhi/sharkpylib/master/requirements.txt
 # https://raw.githubusercontent.com/sharksmhi/ctdpy/master/requirements.txt

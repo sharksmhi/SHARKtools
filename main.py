@@ -7,6 +7,7 @@ import importlib
 import logging
 import logging.config
 import logging.handlers
+import screeninfo
 
 import matplotlib
 matplotlib.use(u'TkAgg')
@@ -113,7 +114,22 @@ class MainApp(tk.Tk):
         # self.settings = core.Settings(default_settings_file_path=default_settings_file_path,
         #                               root_directory=self.root_directory)
 
-        geo = self.user_manager.get_app_settings('main window', 'geometry', '1480x950+0+0')
+        def_geo = '1480x950+0+0'
+        geo = self.user_manager.get_app_settings('main window', 'geometry', def_geo)
+        if len(screeninfo.get_monitors()) == 1:
+            monitor = screeninfo.get_monitors()[0]
+            sc, lr, ud = geo.split('+')
+            w, h = sc.split('x')
+            if lr[0] == '-':
+                geo = def_geo
+            elif ud[0] == '-':
+                geo = def_geo
+            elif (int(lr) + int(w)) > monitor.width:
+                geo = def_geo
+            elif (int(ud) + int(h)) > monitor.height:
+                geo = def_geo
+
+
 
         self.info_popup = gui.InformationPopup(self)
 
