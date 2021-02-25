@@ -3,6 +3,8 @@
 
 # To use basemap you might need to install Microsoft Visual C++: https://visualstudio.microsoft.com/visual-cpp-build-tools/
 
+# subprocess.check_output(["git", "describe", "__always"]).strip().decode()
+
 import importlib
 import logging
 import logging.config
@@ -779,11 +781,9 @@ def main():
     return app
     
 if __name__ == '__main__':
+    # import sys
+    # print(sys.executable)
     print('Version', )
     app = main()
-
-
-
-
 
 
