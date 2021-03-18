@@ -74,6 +74,9 @@ class App(PluginApp):
 
         self.update_all()
 
+    def close(self):
+        pass
+
     def update_page(self):
         self.update_all()
 

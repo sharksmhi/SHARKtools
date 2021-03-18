@@ -705,6 +705,14 @@ class MainApp(tk.Tk):
 
     def quit_toolbox(self):
         self.user_manager.set_app_settings('main window', 'geometry', self.geometry())
+
+        for page_name, frame in self.frames.items():
+            if self.pages_started.get(page_name):
+                try:
+                    frame.close()
+                except:
+                    pass
+
         self._close_log_handlers()
         self.destroy()  # Closes window
         self.quit()  # Terminates program
