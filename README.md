@@ -1,6 +1,5 @@
-# GISMOtoolbox (gismo_gui_tkinter)
-GISMOtoolbox is a Python 3.6 GUI application for working with in-situ data from ferrybox and fixed platforms. 
-Functionality includes automatic and visual flagging of data, comparison between sampling types and interactive plot exports. 
+# SHARKtools
+SHARKtools is a Python 3 GUI plugin-application originaly developed to work with in-situ data from ferrybox and fixed platforms.
 Graphics by tkinter. 
 
 ### Preparations and requirements 
