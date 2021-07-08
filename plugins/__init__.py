@@ -7,5 +7,5 @@ PLUGIN_LIST = [p for p in os.listdir(os.path.dirname(__file__)) if not '.' in p 
 
 PLUGIN_LIST.pop(PLUGIN_LIST.index('blueprint'))
 
-for plugin in PLUGIN_LIST:
-    importlib.import_module('plugins.{}'.format(plugin))
+# for plugin in PLUGIN_LIST:
+#     importlib.import_module('plugins.{}'.format(plugin))

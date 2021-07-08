@@ -1,0 +1,521 @@
+@startuml
+
+title SHARKtools_class_diagram
+
+class main.MainApp #3E28D0 {}
+
+class main.Boxen #3E28D0 {}
+
+class exceptions.GUIException #EB1759 {}
+
+class exceptions.GUIExceptionMissingAttribute #EB1759 {}
+
+class exceptions.GUIExceptionUserError #EB1759 {}
+
+class exceptions.GUIExceptionBreak #EB1759 {}
+
+class exceptions.GUIExceptionNoRangeSelection #EB1759 {}
+
+class mappings.Colormaps #4A2C65 {}
+
+class paths.Paths #913F81 {}
+
+class user.UserManager #D70689 {}
+
+class user.User #D70689 {}
+
+class user.UserSettings #D70689 {}
+
+class user.UserSettingsParameter #D70689 {}
+
+class user.AppSettings #D70689 {}
+
+class user.UserSettingsPriorityList #D70689 {}
+
+class page_about.PageAbout #AEE78C {}
+
+class page_start.PageStart #1CAF4E {}
+
+class template_page.PageTemplate #184300 {}
+
+class widgets.SaveWidget #43ED0F {}
+
+class widgets.SaveWidgetHTML #43ED0F {}
+
+class widgets.MovableText #43ED0F {}
+
+class widgets.InformationPopup #43ED0F {}
+
+class widgets.EntryPopup #43ED0F {}
+
+class plugin_app.PluginApp #4FC615 {}
+
+class app.App #07C982 {}
+
+class page_start.PageStart #1DD5CF {}
+
+class page_user.PageUser #C0663C {}
+
+class app.App #9963FA {}
+
+class page_algaware.BaseGUI #1B1CA4 {}
+
+class page_algaware.PageAlgaware #1B1CA4 {}
+
+class page_user.PageUser #5A741B {}
+
+class app.App #910722 {}
+
+class saves.Saves #3C8A91 {}
+
+class saves.SaveSelection #3C8A91 {}
+
+class test_scrollbar.scrollingFrame #59A746 {}
+
+class test_scrollbar.messageList #59A746 {}
+
+class components.AutocompleteCombobox #395ACD {}
+
+class components.MonospaceLabel #395ACD {}
+
+class components.ColoredFrame #395ACD {}
+
+class components.LabelDropdownList #395ACD {}
+
+class components.LabelEntry #395ACD {}
+
+class components.LabelDoubleEntry #395ACD {}
+
+class components.CruiseLabelDoubleEntry #395ACD {}
+
+class components.CallbackButton #395ACD {}
+
+class components.DepthEntry #395ACD {}
+
+class components.VesselLabelDoubleEntry #395ACD {}
+
+class components.SelectDirectory #395ACD {}
+
+class components.SelectedInstrumentTextFrame #395ACD {}
+
+class components.SeriesEntryPicker #395ACD {}
+
+class components.SurfaceSoakSelector #395ACD {}
+
+class components.SensorTable #395ACD {}
+
+class components.LabelCheckbox #395ACD {}
+
+class components.PositionEntries #395ACD {}
+
+class frames.ColoredFrame #091D3F {}
+
+class frames.CommonFrameMethods #091D3F {}
+
+class frames.StationPreSystemFrame #091D3F {}
+
+class frames.TransectPreSystemFrame #091D3F {}
+
+class frames.ProcessingFrame #091D3F {}
+
+class frames.FrameProcessing #091D3F {}
+
+class frames.FrameSelectInstrument #091D3F {}
+
+class frames.FrameStartUp #091D3F {}
+
+class frames.FrameManageCTDcastsStation #091D3F {}
+
+class frames.FrameManageCTDcastsTransect #091D3F {}
+
+class page_start.PageStart #CD9661 {}
+
+class app.App #D595A1 {}
+
+class page_metadata.PageMetadata #DF0161 {}
+
+class page_profile.PageProfile #9C0FA5 {}
+
+class page_sampling_types_settings.PageSamplingTypeSettings #F1CB3E {}
+
+class page_start.PageStart #FF1C90 {}
+
+class page_time_series.PageTimeSeries #C3207C {}
+
+class page_user.PageUser #97A379 {}
+
+class template_page.PageTemplate #F73A09 {}
+
+class widgets.RangeSelectorFloatWidget #C550CB {}
+
+class widgets.RangeSelectorTimeWidget #C550CB {}
+
+class widgets.AxisSettingsBaseWidget #C550CB {}
+
+class widgets.AxisSettingsFloatWidget #C550CB {}
+
+class widgets.AxisSettingsTimeWidget #C550CB {}
+
+class widgets.CompareWidget #C550CB {}
+
+class widgets.FilterPopup #C550CB {}
+
+class widgets.QCroutineOptionsPopup #C550CB {}
+
+class widgets.FilterWidgetTable #C550CB {}
+
+class widgets.FilterWidgetSelection #C550CB {}
+
+class widgets.QCroutineOptionsWidget #C550CB {}
+
+class widgets.QCroutineWidget #C550CB {}
+
+class widgets.QCroutineWidgetSingle #C550CB {}
+
+class app.App #3AC95B {}
+
+class components.LabelDropdownList #9885BA {}
+
+class components.LabelDoubleEntry #9885BA {}
+
+class components.SeriesEntryPicker #9885BA {}
+
+class components.SurfaceSoakSelector #9885BA {}
+
+class page_advanced.PageAdvanced #104968 {}
+
+class page_basic.PageBasic #8D866C {}
+
+class page_start.PageStart #8129AC {}
+
+class page_test.PageTest #69242B {}
+
+class page_user.PageUser #7D562F {}
+
+class app.App #232A14 {}
+
+class page_tavastland.PageTavastland #8E07AD {}
+
+class page_user.PageUser #40D81D {}
+
+class app.App #B478E9 {}
+
+class page_colors.PageColors #35767A {}
+
+class page_start.PageStart #45B9F6 {}
+
+
+
+main.Boxen <|-- object
+
+exceptions.GUIException <|-- Exception
+
+exceptions.GUIExceptionMissingAttribute <|-- exceptions.GUIException
+
+exceptions.GUIExceptionUserError <|-- exceptions.GUIException
+
+exceptions.GUIExceptionBreak <|-- exceptions.GUIException
+
+exceptions.GUIExceptionNoRangeSelection <|-- exceptions.GUIException
+
+mappings.Colormaps <|-- object
+
+paths.Paths <|-- object
+
+user.UserManager <|-- object
+
+user.User <|-- object
+
+user.UserSettings <|-- object
+
+user.UserSettingsParameter <|-- user.UserSettings
+
+user.AppSettings <|-- user.UserSettingsParameter
+
+user.UserSettingsPriorityList <|-- user.UserSettings
+
+
+
+
+
+
+widgets.MovableText <|-- object
+
+widgets.InformationPopup <|-- object
+
+widgets.EntryPopup <|-- object
+
+
+app.App <|-- PluginApp
+app.App <|-- plugin_app.PluginApp
+app.App <|-- plugin_app.PluginApp
+app.App <|-- plugin_app.PluginApp
+app.App <|-- plugin_app.PluginApp
+app.App <|-- plugin_app.PluginApp
+app.App <|-- plugin_app.PluginApp
+app.App <|-- plugin_app.PluginApp
+
+
+page_algaware.BaseGUI <|-- object
+
+page_algaware.PageAlgaware <|-- page_algaware.BaseGUI
+
+test_scrollbar.scrollingFrame <|-- Frame
+
+test_scrollbar.messageList <|-- object
+
+
+
+
+
+
+
+components.CruiseLabelDoubleEntry <|-- components.LabelDoubleEntry
+
+
+
+components.VesselLabelDoubleEntry <|-- components.LabelDoubleEntry
+
+
+
+
+
+
+
+
+
+frames.StationPreSystemFrame <|-- SaveSelection
+frames.StationPreSystemFrame <|-- frames.CommonFrameMethods
+frames.StationPreSystemFrame <|-- saves.SaveSelection
+
+frames.TransectPreSystemFrame <|-- SaveSelection
+frames.TransectPreSystemFrame <|-- frames.CommonFrameMethods
+frames.TransectPreSystemFrame <|-- saves.SaveSelection
+
+frames.ProcessingFrame <|-- SaveSelection
+frames.ProcessingFrame <|-- saves.SaveSelection
+
+
+
+frames.FrameStartUp <|-- SaveSelection
+frames.FrameStartUp <|-- saves.SaveSelection
+
+
+
+
+
+
+
+
+
+
+widgets.AxisSettingsFloatWidget <|-- widgets.AxisSettingsBaseWidget
+
+widgets.AxisSettingsTimeWidget <|-- widgets.AxisSettingsBaseWidget
+
+
+widgets.FilterPopup <|-- object
+
+widgets.QCroutineOptionsPopup <|-- object
+
+
+
+
+
+
+
+
+
+
+
+main.Boxen o-- main.MainApp
+main.Boxen o-- app.App
+
+user.UserManager o-- user.AppSettings
+user.UserManager o-- user.User
+user.UserManager o-- user.User
+user.UserManager o-- user.User
+user.UserManager o-- user.User
+user.UserManager o-- user.User
+user.UserManager o-- user.User
+user.UserManager o-- exceptions.GUIException
+user.UserManager o-- exceptions.GUIExceptionUserError
+user.UserManager o-- app.App
+
+user.User o-- user.User
+user.User o-- user.UserSettings
+user.User o-- user.User
+user.User o-- user.UserSettings
+user.User o-- user.UserSettingsParameter
+user.User o-- user.User
+user.User o-- user.UserSettings
+user.User o-- user.UserSettingsPriorityList
+
+user.UserSettings o-- user.User
+user.UserSettings o-- exceptions.GUIException
+user.UserSettings o-- exceptions.GUIExceptionUserError
+user.UserSettings o-- paths.Paths
+
+user.UserSettingsParameter o-- user.User
+user.UserSettingsParameter o-- user.UserSettings
+
+user.AppSettings o-- user.User
+user.AppSettings o-- user.UserSettings
+user.AppSettings o-- user.UserSettingsParameter
+
+user.UserSettingsPriorityList o-- user.User
+user.UserSettingsPriorityList o-- user.UserSettings
+
+app.App o-- app.App
+app.App o-- app.App
+app.App o-- paths.Paths
+app.App o-- user.User
+app.App o-- page_start.PageStart
+app.App o-- plugin_app.PluginApp
+
+saves.SaveSelection o-- saves.Saves
+
+test_scrollbar.messageList o-- test_scrollbar.scrollingFrame
+test_scrollbar.messageList o-- test_scrollbar.messageList
+
+components.LabelDropdownList o-- components.MonospaceLabel
+components.LabelDropdownList o-- components.AutocompleteCombobox
+
+components.LabelEntry o-- components.MonospaceLabel
+
+components.LabelDoubleEntry o-- components.MonospaceLabel
+
+components.DepthEntry o-- components.MonospaceLabel
+
+components.SelectDirectory o-- components.MonospaceLabel
+
+components.SelectedInstrumentTextFrame o-- components.MonospaceLabel
+
+components.SeriesEntryPicker o-- components.MonospaceLabel
+
+components.SurfaceSoakSelector o-- components.MonospaceLabel
+
+components.LabelCheckbox o-- components.MonospaceLabel
+
+components.PositionEntries o-- components.MonospaceLabel
+components.PositionEntries o-- components.MonospaceLabel
+
+frames.FrameProcessing o-- frames.ProcessingFrame
+frames.FrameProcessing o-- components.SelectedInstrumentTextFrame
+
+frames.FrameManageCTDcastsStation o-- frames.StationPreSystemFrame
+frames.FrameManageCTDcastsStation o-- components.SelectedInstrumentTextFrame
+
+frames.FrameManageCTDcastsTransect o-- frames.TransectPreSystemFrame
+frames.FrameManageCTDcastsTransect o-- components.SelectedInstrumentTextFrame
+
+widgets.AxisSettingsFloatWidget o-- widgets.AxisSettingsBaseWidget
+
+widgets.AxisSettingsTimeWidget o-- widgets.AxisSettingsBaseWidget
+
+widgets.FilterPopup o-- widgets.FilterWidgetSelection
+
+widgets.QCroutineOptionsPopup o-- widgets.QCroutineOptionsWidget
+
+widgets.FilterWidgetTable o-- widgets.FilterPopup
+
+widgets.QCroutineWidget o-- widgets.QCroutineWidget
+widgets.QCroutineWidget o-- widgets.QCroutineWidgetSingle
+
+widgets.QCroutineWidgetSingle o-- widgets.QCroutineOptionsPopup
+
+main.MainApp o-- exceptions.GUIException
+main.MainApp o-- exceptions.GUIExceptionUserError
+main.MainApp o-- paths.Paths
+main.MainApp o-- user.UserManager
+main.MainApp o-- user.User
+main.MainApp o-- page_start.PageStart
+main.MainApp o-- widgets.InformationPopup
+main.MainApp o-- page_user.PageUser
+
+page_profile.PageProfile o-- exceptions.GUIException
+page_profile.PageProfile o-- exceptions.GUIExceptionBreak
+page_profile.PageProfile o-- exceptions.GUIExceptionNoRangeSelection
+page_profile.PageProfile o-- mappings.Colormaps
+page_profile.PageProfile o-- widgets.SaveWidget
+page_profile.PageProfile o-- widgets.SaveWidgetHTML
+page_profile.PageProfile o-- widgets.FilterWidgetTable
+page_profile.PageProfile o-- widgets.AxisSettingsFloatWidget
+page_profile.PageProfile o-- widgets.QCroutineWidget
+page_profile.PageProfile o-- widgets.RangeSelectorFloatWidget
+page_profile.PageProfile o-- widgets.CompareWidget
+
+page_sampling_types_settings.PageSamplingTypeSettings o-- exceptions.GUIException
+page_sampling_types_settings.PageSamplingTypeSettings o-- app.App
+
+page_time_series.PageTimeSeries o-- exceptions.GUIException
+page_time_series.PageTimeSeries o-- exceptions.GUIExceptionBreak
+page_time_series.PageTimeSeries o-- exceptions.GUIExceptionNoRangeSelection
+page_time_series.PageTimeSeries o-- mappings.Colormaps
+page_time_series.PageTimeSeries o-- widgets.SaveWidget
+page_time_series.PageTimeSeries o-- widgets.SaveWidgetHTML
+page_time_series.PageTimeSeries o-- app.App
+page_time_series.PageTimeSeries o-- widgets.AxisSettingsFloatWidget
+page_time_series.PageTimeSeries o-- widgets.QCroutineWidget
+page_time_series.PageTimeSeries o-- widgets.AxisSettingsTimeWidget
+page_time_series.PageTimeSeries o-- widgets.RangeSelectorTimeWidget
+page_time_series.PageTimeSeries o-- widgets.RangeSelectorFloatWidget
+page_time_series.PageTimeSeries o-- widgets.CompareWidget
+
+page_user.PageUser o-- mappings.Colormaps
+page_user.PageUser o-- user.User
+page_user.PageUser o-- app.App
+
+plugin_app.PluginApp o-- paths.Paths
+plugin_app.PluginApp o-- user.User
+plugin_app.PluginApp o-- app.App
+
+page_about.PageAbout o-- app.App
+
+page_start.PageStart o-- app.App
+page_start.PageStart o-- frames.FrameSelectInstrument
+page_start.PageStart o-- frames.FrameStartUp
+page_start.PageStart o-- frames.FrameManageCTDcastsStation
+page_start.PageStart o-- frames.FrameManageCTDcastsTransect
+
+template_page.PageTemplate o-- app.App
+
+page_algaware.PageAlgaware o-- app.App
+
+page_metadata.PageMetadata o-- app.App
+
+page_advanced.PageAdvanced o-- app.App
+
+page_basic.PageBasic o-- app.App
+
+page_test.PageTest o-- app.App
+page_test.PageTest o-- components.SurfaceSoakSelector
+page_test.PageTest o-- components.LabelDropdownList
+page_test.PageTest o-- components.LabelDoubleEntry
+page_test.PageTest o-- components.SeriesEntryPicker
+
+page_tavastland.PageTavastland o-- app.App
+
+page_colors.PageColors o-- app.App
+
+frames.StationPreSystemFrame o-- components.LabelDoubleEntry
+frames.StationPreSystemFrame o-- components.CruiseLabelDoubleEntry
+frames.StationPreSystemFrame o-- components.SeriesEntryPicker
+frames.StationPreSystemFrame o-- components.LabelDropdownList
+frames.StationPreSystemFrame o-- components.LabelEntry
+frames.StationPreSystemFrame o-- components.DepthEntry
+frames.StationPreSystemFrame o-- components.VesselLabelDoubleEntry
+frames.StationPreSystemFrame o-- components.CallbackButton
+frames.StationPreSystemFrame o-- components.PositionEntries
+
+frames.TransectPreSystemFrame o-- components.LabelDoubleEntry
+frames.TransectPreSystemFrame o-- components.CruiseLabelDoubleEntry
+frames.TransectPreSystemFrame o-- components.SeriesEntryPicker
+frames.TransectPreSystemFrame o-- components.LabelDropdownList
+frames.TransectPreSystemFrame o-- components.LabelCheckbox
+
+frames.FrameSelectInstrument o-- components.SelectDirectory
+
+frames.FrameStartUp o-- components.SensorTable
+
+@enduml

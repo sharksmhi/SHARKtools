@@ -37,6 +37,10 @@ class App(PluginApp):
         self.root_directory = self.main_app.root_directory
         self.log_directory = self.main_app.log_directory
 
+    @property
+    def user(self):
+        return self.main_app.user
+
     def startup(self):
         """
         """
@@ -51,7 +55,6 @@ class App(PluginApp):
         self.settings = self.main_app.settings
 
         self.user_manager = self.main_app.user_manager
-        self.user = self.main_app.user
 
         self._create_titles()
 
@@ -75,7 +78,12 @@ class App(PluginApp):
         self.update_all()
 
     def close(self):
-        pass
+        for page_name, frame in self.frames.items():
+            if self.pages_started.get(page_name):
+                try:
+                    frame.close()
+                except:
+                    pass
 
     def update_page(self):
         self.update_all()

@@ -170,6 +170,7 @@ class MainApp(tk.Tk):
     def _setup_logger(self, **kwargs):
         name = Path(__file__).stem
         self.logger = logging.getLogger(name)
+        # self.logger = logging.getLogger()
         self.logger.setLevel(self.logging_level)
         file_path = kwargs.get('logging_file_path')
         if not file_path:

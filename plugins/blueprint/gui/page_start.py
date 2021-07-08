@@ -7,11 +7,6 @@
 import tkinter as tk
 
 
-"""
-================================================================================
-================================================================================
-================================================================================
-"""
 class PageStart(tk.Frame):
 
     def __init__(self, parent, parent_app, **kwargs):
@@ -20,15 +15,19 @@ class PageStart(tk.Frame):
         self.parent = parent
         self.parent_app = parent_app
 
+    @property
+    def user(self):
+        return self.parent_app.user
+
     def startup(self):
         """
-
         :return:
         """
         tk.Label(self, text='Startup page').grid()
         self.update_page()
 
+    def close(self):
+        pass
 
-    #===========================================================================
     def update_page(self):
         pass

@@ -34,15 +34,14 @@ class PageUser(tk.Frame):
         self.color_list = utils.ColorsList()
         self.marker_list = utils.MarkerList()
 
-    #===========================================================================
     def startup(self):
         self._set_frame()
-    
-    #===========================================================================
+
+    def close(self):
+        pass
+
     def update_page(self):
         self.user = self.user_manager.user
 
-        
-    #===========================================================================
     def _set_frame(self):
         tk.Label(self, text='User settings page').grid()
