@@ -11,8 +11,8 @@ import logging.config
 import logging.handlers
 import screeninfo
 
-import matplotlib
-matplotlib.use(u'TkAgg')
+# import matplotlib
+# matplotlib.use(u'TkAgg')
 
 import os
 import socket
