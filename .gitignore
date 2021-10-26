@@ -1,3 +1,13 @@
+sharkpylib/
+ctdpy/
+ctdvis/
+pre_system_svea/
+ctd_processing/
+svepa/
+algaware/
+svea/
+stations/
+
 venv/
 venv38/
 .env
