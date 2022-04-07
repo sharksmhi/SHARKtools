@@ -788,11 +788,9 @@ def main():
     app.focus_force()
     app.mainloop()
     return app
-    
+
+
 if __name__ == '__main__':
-    # import sys
-    # print(sys.executable)
-    print('Version', )
     app = main()
 
 
