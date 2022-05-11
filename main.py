@@ -169,8 +169,8 @@ class MainApp(tk.Tk):
 
     def _setup_logger(self, **kwargs):
         name = Path(__file__).stem
-        self.logger = logging.getLogger(name)
-        # self.logger = logging.getLogger()
+        # self.logger = logging.getLogger(name)
+        self.logger = logging.getLogger()
         self.logger.setLevel(self.logging_level)
         file_path = kwargs.get('logging_file_path')
         if not file_path:
@@ -179,7 +179,7 @@ class MainApp(tk.Tk):
                 os.makedirs(directory)
             file_path = Path(directory, f'{name}.log')
         # handler = logging.FileHandler(str(file_path))
-        handler = logging.handlers.TimedRotatingFileHandler(str(file_path), when='D', interval=1, backupCount=7)
+        handler = logging.handlers.TimedRotatingFileHandler(str(file_path), when='D', interval=1, backupCount=14)
         formatter = logging.Formatter(self.logging_format)
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)

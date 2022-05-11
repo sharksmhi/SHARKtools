@@ -3,21 +3,10 @@
 # License: MIT License (see LICENSE.txt or http://opensource.org/licenses/mit).
 
 import tkinter as tk
-from tkinter import ttk
 
-import core
-
-import sharkpylib.tklib.tkinter_widgets as tkw
 from sharkpylib import utils
 
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 
-"""
-================================================================================
-================================================================================
-================================================================================
-"""
 class PageUser(tk.Frame):
     """
     """
@@ -29,7 +18,6 @@ class PageUser(tk.Frame):
         self.main_app = self.parent_app.main_app
         self.user_manager = parent_app.user_manager
         self.user = self.user_manager.user
-        self.settings = parent_app.settings
 
         self.color_list = utils.ColorsList()
         self.marker_list = utils.MarkerList()
