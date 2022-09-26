@@ -146,11 +146,15 @@ class UserManager(object):
 
 class User(object):
     def __init__(self, name, users_root_directory, **kwargs):
-        self.name = name
+        self._name = name
         # print(self.name)
         self.user_directory = os.path.join(users_root_directory, self.name)
         if not os.path.exists(self.user_directory):
             os.mkdir(self.user_directory)
+
+    @property
+    def name(self):
+        return self._name
 
     def add_user_settings(self, settings_type, **kwargs):
         if settings_type == 'basic':
