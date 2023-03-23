@@ -17,6 +17,7 @@ import screeninfo
 import os
 import socket
 import tkinter as tk
+from tkinter import ttk
 from pathlib import Path
 
 import sharkpylib.tklib.tkinter_widgets as tkw
@@ -105,6 +106,7 @@ class MainApp(tk.Tk):
         # self.logging_level = 'WARNING'
         self.logging_level = self.user_manager.get_app_settings('logging', 'level', 'WARNING')
         self.logging_format = '%(asctime)s [%(levelname)10s]    %(pathname)s [%(lineno)d] => %(funcName)s():    %(message)s'
+        self.logging_format_stdout = '[%(levelname)10s] %(filename)s: %(funcName)s() [%(lineno)d] %(message)s'
         self._setup_logger(**kwargs)
 
         self.logger.debug('===== START ======')
@@ -131,8 +133,6 @@ class MainApp(tk.Tk):
             elif (int(ud) + int(h)) > monitor.height:
                 geo = def_geo
 
-
-
         self.info_popup = gui.InformationPopup(self)
 
         # If this is not implemented the program is not properly closed.
@@ -147,11 +147,23 @@ class MainApp(tk.Tk):
         self.progress_running = False
         self.progress_running_toplevel = False
 
+        self.progress_window = None
+
         self._set_frame()
 
         # Make menu at the top
         self._set_menubar()
         self.selected_logging_level.set(self.logging_level)
+
+        # Create a Label in the toplevel widget
+        self.progress_text = tk.StringVar()
+        self.progress_window = tk.Toplevel(self)
+        self.progress_window.geometry("400x200")
+        self.progress_label = tk.Label(self.progress_window, textvariable=self.progress_text)
+        self.progress_label.pack()
+        # self.pbar = ttk.Progressbar(self.progress_window, orient=tk.HORIZONTAL, length=400, mode='determinate')
+        # self.pbar.grid(row=0, column=0)
+        self.progress_window.withdraw()
 
         self.startup_pages()
         self.user_manager.set_users_directory(self.users_directory)
@@ -162,28 +174,36 @@ class MainApp(tk.Tk):
         # self.show_subframe('SHARKtools_svea_ctd', 'PageBasic')
         # self.show_frame('PageStart')
 
-        self.update_all()
+        # self.update_all()
         self.deiconify()
 
         # self._quick_run_F1(None)
 
+
     def _setup_logger(self, **kwargs):
-        name = Path(__file__).stem
+        name = 'SHARKtools'
         # self.logger = logging.getLogger(name)
         self.logger = logging.getLogger()
         self.logger.setLevel(self.logging_level)
-        file_path = kwargs.get('logging_file_path')
-        if not file_path:
-            directory = Path(Path(__file__).absolute().parent, 'log')
-            if not directory.exists():
-                os.makedirs(directory)
-            file_path = Path(directory, f'{name}.log')
-        # handler = logging.FileHandler(str(file_path))
-        # handler = logging.handlers.TimedRotatingFileHandler(str(file_path), when='D', interval=1, backupCount=14)
-        handler = logging.handlers.TimedRotatingFileHandler(str(file_path), when='H', interval=3, backupCount=336)
+
+        debug_file_path = Path(self.log_directory, f'{name}_debug.log')
+        handler = logging.handlers.TimedRotatingFileHandler(str(debug_file_path), when='H', interval=3, backupCount=10)
+        handler.setLevel(logging.DEBUG)
         formatter = logging.Formatter(self.logging_format)
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
+
+        debug_file_path = Path(self.log_directory, f'{name}_warning.log')
+        handler = logging.handlers.TimedRotatingFileHandler(str(debug_file_path), when='D', interval=1, backupCount=14)
+        handler.setLevel(logging.WARNING)
+        formatter = logging.Formatter(self.logging_format)
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
+
+        # stream_handler = logging.StreamHandler()
+        # stream_formatter = logging.Formatter(self.logging_format_stdout)
+        # stream_handler.setFormatter(stream_formatter)
+        # self.logger.addHandler(stream_handler)
 
     def set_logging_level(self, level):
         self.logging_level = level
@@ -321,7 +341,7 @@ class MainApp(tk.Tk):
 
     def run_progress_in_toplevel(self, run_function, message=''):
         """
-        Rins progress in a toplevel window.
+        Runs progress in a toplevel window.
         :param run_function:
         :param message:
         :return:
@@ -628,7 +648,7 @@ class MainApp(tk.Tk):
 
     def show_subframe(self, main_page, sub_page):
         print(main_page, sub_page)
-        self.show_frame(main_page)
+        self.show_frame(main_page, update=False)
         self.frames[main_page].show_frame(sub_page)
         self.user_manager.set_app_settings('start page', 'mainpage', main_page)
         self.user_manager.set_app_settings('start page', 'subpage', sub_page)
@@ -643,7 +663,7 @@ class MainApp(tk.Tk):
         user_dir = Path(self.app_directory, 'plugins', plugin_name, users_directory)
         return user_dir
 
-    def show_frame(self, page_name=None, page=None):
+    def show_frame(self, page_name=None, page=None, update=True):
         """
         This method brings the given Page to the top of the GUI.
         Before "raise" call frame startup method.
@@ -666,7 +686,8 @@ class MainApp(tk.Tk):
             frame.startup()
             self.pages_started[page_name] = True
 
-        frame.update_page()
+        if update:
+            frame.update_page()
 
         if load_page:
             frame.tkraise()
@@ -739,7 +760,51 @@ class MainApp(tk.Tk):
     def get_plugins():
         return PLUGINS
 
+    def open_progress_window(self, text='Programmet jobbar. RÖR INGET!'):
+        self.progress_text.set(text)
+        self.progress_window.title('Arbetar...')
+        x = self.winfo_x()
+        y = self.winfo_y()
+        self.progress_window.geometry("+%d+%d" % (x + 300, y + 200))
+        self.progress_window.update_idletasks()
+        self.progress_label.update_idletasks()
+        self.progress_window.deiconify()
+        self.progress_window.update_idletasks()
+        self.progress_label.update_idletasks()
+        import time
+        time.sleep(0.5)
+        # self.progress_widget.update_idletasks()
 
+
+        # self.progress_window = tk.Toplevel(self)
+        # self.progress_window.geometry("400x200")
+        # #
+        # # x = self.winfo_x()
+        # # y = self.winfo_y()
+        # #
+        # # self.progress_window.geometry("+%d+%d" % (x + 200, y + 200))
+        # # self.progress_window.title('Arbetar...')
+        #
+        # from tkinter import ttk
+        #
+        # # self.pbar = ttk.Progressbar(self.progress_window, orient=tk.HORIZONTAL, length=400, mode='determinate')
+        # # self.pbar.grid(row=0, column=0)
+        # tk.Label(self.progress_window, text='ARBETE PÅGÅR...').grid(row=1, column=0)
+        # # tk.Label(self.progress_window, text=text).grid(row=1, column=0)
+        # # self.pbar.start()
+        # self.progress_window.update_idletasks()
+        # self.update_idletasks()
+        # self.update_idletasks()
+        # self.progress_window.focus_set()
+        # self.progress_window.grab_set()
+
+    def close_progress_window(self):
+        self.progress_window.withdraw()
+        # if not self.progress_window:
+        #     return
+        # # self.progress_window.grab_release()
+        # self.progress_window.destroy()
+        # self.progress_window = None
 
 
 """
