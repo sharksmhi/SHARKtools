@@ -9,8 +9,6 @@ import os
 import sys
 
 import core
-from sharkpylib.gismo.exceptions import *
-from sharkpylib import loglib
 
 
 ALL_PAGES = dict()
@@ -78,7 +76,7 @@ class PluginApp(tk.Frame):
 
         :return:
         """
-        raise GISMOExceptionMethodNotImplemented
+        raise Exception('Method not implemented')
 
 
 
