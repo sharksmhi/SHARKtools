@@ -104,7 +104,7 @@ class MainApp(tk.Tk):
 
         self.logger = None
         # self.logging_level = 'WARNING'
-        self.logging_level = self.user_manager.get_app_settings('logging', 'level', 'WARNING')
+        self.logging_level = self.user_manager.get_app_settings('logging', 'level', 'DEBUG')
         self.logging_format = '%(asctime)s [%(levelname)10s]    %(pathname)s [%(lineno)d] => %(funcName)s():    %(message)s'
         self.logging_format_stdout = '[%(levelname)10s] %(filename)s: %(funcName)s() [%(lineno)d] %(message)s'
         self._setup_logger(**kwargs)
