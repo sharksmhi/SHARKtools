@@ -1,5 +1,3 @@
-# Copyright (c) 2018 SMHI, Swedish Meteorological and Hydrological Institute
-# License: MIT License (see LICENSE.txt or http://opensource.org/licenses/mit).
 import datetime
 import json
 import logging
@@ -10,7 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from core.exceptions import *
+from sharktools.core.exceptions import *
 
 gui_logger = logging.getLogger('gui_logger')
 

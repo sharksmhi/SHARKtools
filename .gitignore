@@ -8,6 +8,8 @@ algaware/
 svea/
 stations/
 
+dist/
+
 venv/
 venv38/
 .env

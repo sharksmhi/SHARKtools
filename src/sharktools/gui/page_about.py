@@ -1,17 +1,10 @@
-# -*- coding: utf-8 -*-
+import os
 import tkinter as tk
-from tkinter import ttk
-import sys
-print(sys.path)
-import sharkpylib.tklib.tkinter_widgets as tkw
-
 import webbrowser
 
-import os
-import core
-#
-# Copyright (c) 2018 SMHI, Swedish Meteorological and Hydrological Institute
-# License: MIT License (see LICENSE.txt or http://opensource.org/licenses/mit).
+import shark_tkinter_lib.tkinter_widgets as tkw
+
+from sharktools import core
 
 """
 ================================================================================

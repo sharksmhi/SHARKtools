@@ -1,11 +1,5 @@
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
-#
-# Copyright (c) 2018 SMHI, Swedish Meteorological and Hydrological Institute
-# License: MIT License (see LICENSE.txt or http://opensource.org/licenses/mit).
-
 import tkinter as tk
-import sharkpylib.tklib.tkinter_widgets as tkw
+import shark_tkinter_lib.tkinter_widgets as tkw
 
 
 
