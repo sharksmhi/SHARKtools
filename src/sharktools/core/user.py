@@ -6,7 +6,7 @@ import shutil
 import socket
 from pathlib import Path
 
-import pandas as pd
+# import pandas as pd
 
 from sharktools.core.exceptions import *
 
@@ -130,7 +130,8 @@ class UserManager(object):
         else:
             file_path = self._get_active_user_file_path()
         if not file_path.exists():
-            active_user = socket.gethostname()
+            # active_user = socket.gethostname()
+            active_user = Path.home().name
         else:
             with open(file_path) as fid:
                 active_user = fid.readline().strip()
@@ -204,7 +205,8 @@ class UserSettings(object):
         for key, value in self.data.items():
             if 'time' in key:
                 if value:
-                    self.data[key] = pd.to_datetime(value).strftime(self.time_string_format)
+                    self.data[key] = value.strftime(self.time_string_format)
+                    # self.data[key] = pd.to_datetime(value).strftime(self.time_string_format)
 
     def path_to_string(self):
         for key, value in self.data.items():
@@ -370,7 +372,8 @@ class UserSettingsParameter(UserSettings):
             for key, value in self.data[par].items():
                 if 'time' in key:
                     if value:
-                        self.data[par][key] = pd.to_datetime(value).strftime(self.time_string_format)
+                        self.data[par][key] = value.strftime(self.time_string_format)
+                        # self.data[par][key] = pd.to_datetime(value).strftime(self.time_string_format)
 
 
 class AppSettings(UserSettingsParameter):
@@ -464,7 +467,8 @@ class AppSettings(UserSettingsParameter):
             for key, value in self.data[par].items():
                 if 'time' in key:
                     if value:
-                        self.data[par][key] = pd.to_datetime(value).strftime(self.time_string_format)
+                        self.data[par][key] = value.strftime(self.time_string_format)
+                        # self.data[par][key] = pd.to_datetime(value).strftime(self.time_string_format)
 
 
 class UserSettingsPriorityList(UserSettings):

@@ -7,7 +7,6 @@ authors = [
 ]
 dependencies = [
     "screeninfo>=0.8.1",
-    "pandas>=2.2.1",
     "cmocean>=4.0.3",
     "shark-tkinter-lib @ git+https://github.com/sharksmhi/shark_tkinter_lib.git",
 ]

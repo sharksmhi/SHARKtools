@@ -2,6 +2,7 @@ import logging
 import logging.config
 import logging.handlers
 import os
+import pathlib
 import socket
 import tkinter as tk
 from importlib.metadata import entry_points
@@ -865,8 +866,9 @@ def run_app():
     """
     root_directory = Path(__file__).parent
 
-    users_directory = root_directory / 'users'
-    log_directory = root_directory / 'log'
+    home_directory = pathlib.Path.home() / 'sharktools'
+    users_directory = home_directory / 'users'
+    log_directory = home_directory / 'log'
 
     users_directory.mkdir(exist_ok=True, parents=True)
     log_directory.mkdir(exist_ok=True, parents=True)
