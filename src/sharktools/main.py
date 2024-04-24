@@ -666,6 +666,8 @@ class MainApp(tk.Tk):
             self.show_frame(mainpage)
 
     def show_subframe(self, main_page, sub_page):
+        if main_page not in self.frames:
+            return
         self.show_frame(main_page, update=False)
         self.frames[main_page].show_frame(sub_page)
         self.user_manager.set_app_settings('start page', 'mainpage', main_page)
