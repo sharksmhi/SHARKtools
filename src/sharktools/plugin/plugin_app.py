@@ -8,7 +8,7 @@ import tkinter as tk
 import os
 import sys
 
-import core
+from sharktools import core
 
 
 ALL_PAGES = dict()

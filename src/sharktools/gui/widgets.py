@@ -1,22 +1,10 @@
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
-#
-# Copyright (c) 2013-2014 SMHI, Swedish Meteorological and Hydrological Institute 
-# License: MIT License (see LICENSE.txt or http://opensource.org/licenses/mit).
+import os
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import ttk
 
 import matplotlib as mpl
-
-import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-
-import os
-
-from sharkpylib import loglib
-
-import sharkpylib.tklib.tkinter_widgets as tkw
-
-logger = loglib.get_logger(name='gismo_gui')
+import shark_tkinter_lib.tkinter_widgets as tkw
 
 
 class SaveWidget(ttk.LabelFrame):

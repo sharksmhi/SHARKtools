@@ -1,7 +1,6 @@
-# Copyright (c) 2018 SMHI, Swedish Meteorological and Hydrological Institute
-# License: MIT License (see LICENSE.txt or http://opensource.org/licenses/mit).
 
 import cmocean
+
 
 class Colormaps(object):
     def __init__(self, default_cmap='jet'):

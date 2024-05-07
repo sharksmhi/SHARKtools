@@ -1,3 +1,0 @@
-screeninfo
-cmocean
-six

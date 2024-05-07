@@ -7,11 +7,11 @@
 import os
 import tkinter as tk
 
-import sharkpylib.tklib.tkinter_widgets as tkw
+import shark_tkinter_lib.tkinter_widgets as tkw
 
-import core
-from plugins.blueprint import gui
-from plugins.plugin_app import PluginApp
+from sharktools import core
+from sharktools.plugin.blueprint import gui
+from sharktools.plugin.plugin_app import PluginApp
 
 ALL_PAGES = dict()
 ALL_PAGES['PageStart'] = gui.PageStart

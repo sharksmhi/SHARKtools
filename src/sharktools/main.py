@@ -1,31 +1,19 @@
-# Copyright (c) 2018 SMHI, Swedish Meteorological and Hydrological Institute 
-# License: MIT License (see LICENSE.txt or http://opensource.org/licenses/mit).
-
-# To use basemap you might need to install Microsoft Visual C++: https://visualstudio.microsoft.com/visual-cpp-build-tools/
-
-# subprocess.check_output(["git", "describe", "__always"]).strip().decode()
-
-import importlib
 import logging
 import logging.config
 import logging.handlers
-import screeninfo
-
-# import matplotlib
-# matplotlib.use(u'TkAgg')
-
 import os
+import pathlib
 import socket
 import tkinter as tk
-from tkinter import ttk
+from importlib.metadata import entry_points
 from pathlib import Path
 
-import sharkpylib.tklib.tkinter_widgets as tkw
+import screeninfo
+import shark_tkinter_lib.tkinter_widgets as tkw
 
-import core
-import gui
-import plugins
-from core.exceptions import *
+from sharktools import core
+from sharktools.core.exceptions import *
+from sharktools import gui
 
 ROOT_PATH = Path(__file__).parent
 
@@ -33,12 +21,28 @@ ALL_PAGES = dict()
 ALL_PAGES['PageStart'] = gui.PageStart
 ALL_PAGES['PageAbout'] = gui.PageAbout
 
+
 # Initiate plugins
-PLUGINS = {}
-for plugin in plugins.PLUGIN_LIST:
-    PLUGINS[plugin] = importlib.import_module('plugins.{}'.format(plugin), '.')
-    plugin_app = PLUGINS[plugin].App
-    ALL_PAGES[plugin] = plugin_app
+PLUGINS = dict()
+APP_TO_PAGE = dict()
+for discovered_plugin in entry_points(group='sharktools.plugins'):
+    name = discovered_plugin.value
+    module = discovered_plugin.load()
+    PLUGINS[name] = module
+    APP_TO_PAGE[module] = name
+    ALL_PAGES[name] = module
+
+
+# PLUGINS = dict()
+# APP_TO_PAGE = dict()
+# for finder, name, ispkg in pkgutil.iter_modules():
+#     if not name.startswith('sharktools_'):
+#         continue
+#     module = importlib.import_module(name)
+#     PLUGINS[name] = module
+#     APP_TO_PAGE[module] = name
+#     ALL_PAGES[name] = module
+
 
 APP_TO_PAGE = dict()
 for plugin_name, plugin_app in ALL_PAGES.items():
@@ -65,8 +69,6 @@ class MainApp(tk.Tk):
                  users_directory='',
                  root_directory='',
                  log_directory='',
-                 # mapping_files_directory='',
-                 # default_settings_file_path='',
                  *args, **kwargs):
         """
         Updated 20181002
@@ -85,6 +87,9 @@ class MainApp(tk.Tk):
         self.root_directory = Path(root_directory)
         self.users_directory = Path(users_directory)
         self.log_directory = Path(log_directory)
+
+        self.home_directory = Path.home() / 'sharktools'
+        self.home_directory.mkdir(exist_ok=True)
 
         # Setting upp GUI logger
         if not self.log_directory.exists():
@@ -234,7 +239,9 @@ class MainApp(tk.Tk):
         for name, plugin_module in _plugins.items():
             users_dir = plugin_module.INFO.get('users_directory', 'users')
             if users_dir:
-                user_directories[plugin_module] = Path(self.app_directory, 'plugins', name, users_dir)
+                user_directories[plugin_module] = self._get_users_directory_for_plugin(name)
+            # if users_dir:
+            #     user_directories[plugin_module] = Path(self.app_directory, '../../plugins', name, users_dir)
         for plugin_module, directory in user_directories.items():
             # Load user managers. One for each plugin. We only use one at the end.
             self.user_manager.set_users_directory(directory)
@@ -252,7 +259,7 @@ class MainApp(tk.Tk):
             # self.settings.change_setting('user', 'Startup user', startup_user)
             # self.settings.save_settings()
             self.user_manager.set_user(startup_user, create_if_missing=True)
-            self.user = self.user_manager.user
+            # self.user = self.user_manager.user
 
             self._add_user_settings(plugin_module, user_directory=directory)
 
@@ -377,9 +384,18 @@ class MainApp(tk.Tk):
         # Looping all pages to make them active.
         for page_name, Page in ALL_PAGES.items():  # Capital P to emphasize class
             # Destroy old page if called as an update
+            print()
+            print(f'{page_name=}')
+            print(f'{Page=}')
+            print(f'{type(Page)=}')
+            try:
+                Page = Page.App
+                print(f'{type(Page)=}')
+            except:
+                pass
             try:
                 self.frames[page_name].destroy()
-                print(page_name, u'Destroyed')
+                print(page_name, 'Destroyed')
             except:
                 pass
             frame = Page(self.container, self)
@@ -610,7 +626,6 @@ class MainApp(tk.Tk):
         if user_name == self.user.name:
             return
         self.user_manager.set_user(user_name)
-        self.user = self.user_manager.user
         self.info_popup = gui.InformationPopup(self)
 
         tk.Tk.wm_title(self, 'SHARKtools, user: {}'.format(self.user.name))
@@ -625,9 +640,13 @@ class MainApp(tk.Tk):
         self.update_all()
 
     def _update_program_title(self):
+        # tk.Tk.wm_title(self, f'SHARKtools :: {self._get_title(self.active_page)}')
         tk.Tk.wm_title(self, 'SHARKtools (user: {}) :: {}'.format(self.user.name, self._get_title(self.active_page)))
 
-    # ===========================================================================
+    @property
+    def user(self):
+        return self.user_manager.user
+
     def show_plugin_user_page(self, active_page):
         """
         Method to display user pages in the given plugin.
@@ -647,7 +666,8 @@ class MainApp(tk.Tk):
             self.show_frame(mainpage)
 
     def show_subframe(self, main_page, sub_page):
-        print(main_page, sub_page)
+        if main_page not in self.frames:
+            return
         self.show_frame(main_page, update=False)
         self.frames[main_page].show_frame(sub_page)
         self.user_manager.set_app_settings('start page', 'mainpage', main_page)
@@ -660,7 +680,8 @@ class MainApp(tk.Tk):
         users_directory = plugin_module.INFO.get('users_directory', 'users')
         if not users_directory:
             return None
-        user_dir = Path(self.app_directory, 'plugins', plugin_name, users_directory)
+        user_dir = Path(self.home_directory, 'plugins', plugin_name, users_directory)
+        user_dir.mkdir(exist_ok=True, parents=True)
         return user_dir
 
     def show_frame(self, page_name=None, page=None, update=True):
@@ -669,13 +690,22 @@ class MainApp(tk.Tk):
         Before "raise" call frame startup method.
         This is so that the Page only loads ones.
         """
+        print('===')
+        print(f'{page_name=}')
+        print(f'{page=}')
         load_page = True
         if page:
             page_name = APP_TO_PAGE[page]
-        frame = self.frames[page_name]
+
+        try:
+            frame = self.frames[page_name]
+        except KeyError:
+            return
 
         user_name = self.user_manager.user.name
         user_dir = self._get_users_directory_for_plugin(page_name)
+        print(f'{page_name=}')
+        print(f'{user_dir=}')
         if user_dir:
             self.user_manager.set_users_directory(user_dir)
         else:
@@ -832,14 +862,19 @@ class Boxen(object):
             self.open_directory = directory
 
 
-def main():
+def run_app():
     """
     Updated 20181002    by
     """
-    root_directory = os.path.dirname(os.path.abspath(__file__))
-    users_directory = os.path.join(root_directory, 'users')
-    log_directory = os.path.join(root_directory, 'log')
-    default_settings_file_path = os.path.join(root_directory, 'system/settings.ini')
+    root_directory = Path(__file__).parent
+
+    home_directory = pathlib.Path.home() / 'sharktools'
+    users_directory = home_directory / 'users'
+    log_directory = home_directory / 'log'
+
+    users_directory.mkdir(exist_ok=True, parents=True)
+    log_directory.mkdir(exist_ok=True, parents=True)
+    # default_settings_file_path = os.path.join(root_directory, 'system/settings.ini')
 
     if not os.path.exists(log_directory):
         os.mkdir(log_directory)
@@ -857,6 +892,6 @@ def main():
 
 
 if __name__ == '__main__':
-    app = main()
+    app = run_app()
 
 
