@@ -24,7 +24,6 @@ distribution = true
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "sharktools-ctd-pre-system @ file:///C:/mw/git/refac_sharktools/SHARKtools_pre_system_Svea",
 ]
 
 [tool.setuptools.packages.find]
