@@ -1,6 +1,6 @@
 [project]
 name = "SHARKtools"
-version = "1.0.0"
+version = "1.1.0"
 description = "SHARKtools is a plugin based GUI used to handle various workflows at SMHI"
 authors = [
     {name = "Magnus Wenzer", email = "nodc@smhi.se"},
@@ -8,7 +8,7 @@ authors = [
 dependencies = [
     "screeninfo>=0.8.1",
     "cmocean>=4.0.3",
-    "shark-tkinter-lib @ git+https://github.com/sharksmhi/shark_tkinter_lib.git@v1.0.0",
+    "shark-tkinter-lib @ git+https://github.com/sharksmhi/shark_tkinter_lib.git@v1.1.0",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
@@ -17,7 +17,6 @@ license = {text = "MIT"}
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
 
 [tool.pdm]
 distribution = true
